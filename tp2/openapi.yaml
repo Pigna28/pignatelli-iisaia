@@ -1,0 +1,237 @@
+openapi: 3.0.3
+
+info:
+  title: RAGEQUIT Cart API
+  version: 1.0.0
+  description: API para manejar los carritos de compra de la tienda gamer RAGEQUIT.
+
+servers:
+  - url: http://localhost:3000
+
+tags:
+  - name: Carts
+    description: Operaciones sobre carritos de compra
+  - name: Cart Items
+    description: Productos agregados a un carrito
+
+paths:
+
+  /carts:
+    get:
+      tags:
+        - Carts
+      summary: Ver todos los carritos
+      operationId: getCarts
+      responses:
+        "200":
+          description: Lista de carritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+
+    post:
+      tags:
+        - Carts
+      summary: Crear un carrito
+      operationId: createCart
+      responses:
+        "201":
+          description: Carrito creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+
+  /carts/{cartId}/items:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        description: ID del carrito
+        schema:
+          type: integer
+          minimum: 1
+          example: 1
+
+    get:
+      tags:
+        - Cart Items
+      summary: Ver los productos de un carrito
+      operationId: getCartItems
+      responses:
+        "200":
+          description: Lista de productos del carrito
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CartItem"
+
+        "404":
+          $ref: "#/components/responses/CartNotFound"
+
+    post:
+      tags:
+        - Cart Items
+      summary: Agregar un producto al carrito
+      operationId: addCartItem
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCartItem"
+            example:
+              product_id: "kb"
+              quantity: 1
+
+      responses:
+        "201":
+          description: Producto agregado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartItem"
+
+        "404":
+          $ref: "#/components/responses/CartNotFound"
+
+  /carts/{cartId}/items/{itemId}:
+    parameters:
+      - name: cartId
+        in: path
+        required: true
+        description: ID del carrito
+        schema:
+          type: integer
+          minimum: 1
+          example: 1
+
+      - name: itemId
+        in: path
+        required: true
+        description: ID del item dentro del carrito
+        schema:
+          type: integer
+          minimum: 1
+          example: 1
+
+    delete:
+      tags:
+        - Cart Items
+      summary: Eliminar un producto del carrito
+      operationId: deleteCartItem
+      responses:
+        "204":
+          description: Producto eliminado correctamente
+
+        "404":
+          $ref: "#/components/responses/CartOrItemNotFound"
+
+components:
+
+  schemas:
+
+    Cart:
+      type: object
+      required:
+        - id
+        - created_at
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: Identificador del carrito generado por el servidor
+          example: 1
+
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Fecha y hora de creación del carrito
+          example: "2026-09-24T20:30:00Z"
+
+    CartItem:
+      type: object
+      required:
+        - id
+        - product_id
+        - quantity
+        - cart_id
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: Identificador del item generado por el servidor
+          example: 1
+
+        product_id:
+          type: string
+          description: Identificador del producto
+          example: "kb"
+
+        quantity:
+          type: integer
+          minimum: 1
+          description: Cantidad del producto
+          example: 1
+
+        cart_id:
+          type: integer
+          minimum: 1
+          readOnly: true
+          description: Identificador del carrito obtenido desde la URL
+          example: 1
+
+    CreateCartItem:
+      type: object
+      additionalProperties: false
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: string
+          description: Identificador del producto que se quiere agregar
+          example: "kb"
+
+        quantity:
+          type: integer
+          minimum: 1
+          description: Cantidad del producto que se quiere agregar
+          example: 1
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Recurso no encontrado
+
+  responses:
+
+    CartNotFound:
+      description: El carrito indicado no existe
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            message: Cart not found
+
+    CartOrItemNotFound:
+      description: El carrito o el item indicado no existe
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            message: Cart or item not found
