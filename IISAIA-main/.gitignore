@@ -1,0 +1,22 @@
+node_modules/
+.claude/*
+!.claude/commands/
+# slide-generation es una skill de proyecto: opera sobre semanas/NN/ y
+# viaja con el repo. git no puede des-ignorar un archivo si su carpeta
+# padre esta excluida, de ahi los tres pasos.
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/slide-generation/
+!.claude/skills/grading/
+.env
+.runpod-pod
+__pycache__/
+.venv/
+
+*.DS_Store
+image.png
+
+entregas
+
+.screenshots/
+.playwright-mcp/

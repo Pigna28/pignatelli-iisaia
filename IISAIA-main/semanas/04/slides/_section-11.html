@@ -1,0 +1,758 @@
+<style>
+/* Scoped styles for §11 only */
+
+/* Heading override scoped to §11 slides */
+.reveal .slides .s11-slide { text-align: center; }
+.reveal .slides .s11-slide h2 {
+  font-size: 0.82em;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.reveal .slides .s11-slide h2 .s11-h2-code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+
+/* --- Five-questions card (full + mini) --- */
+.reveal .slides .s11-slide h2.s11-five-q-title {
+  font-size: 1.05em;
+  text-align: center;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+.reveal .s11-five-q-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 900px;
+}
+.reveal .s11-five-q-card {
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-radius: 6px;
+  padding: 9px 10px 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+.reveal .s11-five-q-card.is-active {
+  opacity: 1;
+  border-color: var(--accent);
+  border-left: 3px solid var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(100, 255, 218, 0.08);
+}
+.reveal .s11-five-q-num {
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.reveal .s11-five-q-card.is-active .s11-five-q-num {
+  color: var(--accent);
+}
+.reveal .s11-five-q-label {
+  font-size: 0.56em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.reveal .s11-five-q-hint {
+  font-size: 0.53em;
+  color: var(--text-muted);
+  line-height: 1.35;
+  text-align: left;
+}
+/* Mini variant */
+.reveal .s11-five-q-grid.is-mini {
+  grid-template-columns: repeat(4, auto);
+  justify-content: center;
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 auto 8px;
+}
+.reveal .s11-five-q-grid.is-mini .s11-five-q-card {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border-left-width: 1px;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+.reveal .s11-five-q-grid.is-mini .s11-five-q-card.is-active {
+  border-left: 1px solid var(--accent);
+}
+.reveal .s11-five-q-grid.is-mini .s11-five-q-num {
+  font-size: 0.43em;
+}
+.reveal .s11-five-q-grid.is-mini .s11-five-q-label {
+  font-size: 0.5em;
+}
+
+/* Qué es — bullet list (definición + callout) */
+.reveal .s11-qe-list {
+  list-style: disc;
+  display: inline-block;
+  text-align: left;
+  max-width: 760px;
+  margin: 16px auto 0;
+  padding-left: 36px;
+  font-size: 0.6em;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.reveal .s11-qe-list li {
+  padding-left: 6px;
+  margin-bottom: 10px;
+}
+.reveal .s11-qe-list li::marker { color: var(--accent); }
+.reveal .s11-qe-list strong { color: var(--text-primary); font-weight: 700; }
+.reveal .s11-qe-list code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+.reveal .s11-qe-list li.s11-qe-callout {
+  list-style: none;
+  margin-left: -32px;
+  margin-top: 10px;
+  background: rgba(100, 255, 218, 0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 8px 14px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Dónde vive — matrix table */
+.reveal .s11-matrix-wrap {
+  max-width: 860px;
+  margin: 12px auto 0;
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.reveal .s11-matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.55em;
+  line-height: 1.45;
+  text-align: left;
+}
+.reveal .s11-matrix-table thead th {
+  background: var(--bg-code);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 8px 12px;
+  border-bottom: 1px solid #2a3a5a;
+}
+.reveal .s11-matrix-table thead th.s11-matrix-rowhead { width: 20%; }
+.reveal .s11-matrix-table tbody td {
+  padding: 9px 12px;
+  vertical-align: top;
+  border-bottom: 1px solid #1e2a48;
+  color: var(--text-muted);
+}
+.reveal .s11-matrix-table tbody tr:last-child td { border-bottom: none; }
+.reveal .s11-matrix-table tbody td.s11-matrix-rowname {
+  color: var(--text-primary);
+  font-weight: 700;
+  vertical-align: middle;
+}
+.reveal .s11-matrix-table tbody td code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.92em;
+}
+.reveal .s11-matrix-note {
+  display: block;
+  max-width: 860px;
+  margin-top: 12px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 0.53em;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+  line-height: 1.5;
+}
+.reveal .s11-matrix-note strong { color: var(--text-primary); font-style: normal; }
+.reveal .s11-matrix-note code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* Cuándo se carga — callout + bullets */
+.reveal .s11-when-callout {
+  display: block;
+  max-width: 760px;
+  margin-top: 14px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  background: rgba(100, 255, 218, 0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 0.66em;
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: left;
+}
+.reveal .s11-when-callout code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+.reveal .s11-when-list {
+  list-style: disc;
+  display: block;
+  text-align: left;
+  max-width: 760px;
+  margin: 14px auto 0;
+  padding-left: 36px;
+  font-size: 0.56em;
+  line-height: 1.55;
+  color: var(--text-muted);
+  box-sizing: border-box;
+}
+.reveal .s11-when-list li {
+  padding-left: 4px;
+  margin-bottom: 8px;
+}
+.reveal .s11-when-list li::marker { color: var(--accent); }
+.reveal .s11-when-list strong { color: var(--text-primary); }
+.reveal .s11-when-list code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+.reveal .s11-when-bottom {
+  display: block;
+  max-width: 760px;
+  margin-top: 12px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 0.55em;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  text-align: center;
+}
+.reveal .s11-when-bottom strong { color: var(--text-primary); font-style: normal; }
+
+/* Code walkthrough — frontmatter + phases */
+.reveal .s11-code-block {
+  display: block;
+  font-weight: 400;
+  max-width: 760px;
+  margin: 10px auto 0;
+  background: var(--bg-code);
+  border: 1px solid #2a3a5a;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: left;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+.reveal .s11-code-block .s11-code-key { color: var(--accent-secondary); }
+.reveal .s11-code-block .s11-code-val { color: var(--text-primary); }
+.reveal .s11-code-block .s11-code-fence { color: var(--text-muted); opacity: 0.7; }
+.reveal .s11-phases-list {
+  list-style: decimal;
+  display: block;
+  text-align: left;
+  max-width: 760px;
+  margin: 10px auto 0;
+  padding-left: 36px;
+  font-size: 0.55em;
+  line-height: 1.45;
+  color: var(--text-muted);
+  box-sizing: border-box;
+}
+.reveal .s11-phases-list li {
+  padding-left: 4px;
+  margin-bottom: 4px;
+}
+.reveal .s11-phases-list li::marker { color: var(--accent); font-family: var(--font-mono); }
+.reveal .s11-phases-list strong { color: var(--text-primary); }
+.reveal .s11-phases-list code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.94em;
+}
+.reveal .s11-anti-card {
+  display: block;
+  max-width: 760px;
+  margin-top: 10px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  background: rgba(255, 118, 118, 0.06);
+  border-left: 3px solid #ff7676;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-align: left;
+  font-size: 0.53em;
+  color: var(--text-muted);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+.reveal .s11-anti-card strong {
+  color: #ff7676;
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}
+.reveal .s11-anti-card code {
+  font-family: var(--font-mono);
+  color: #ff7676;
+  font-size: 0.95em;
+}
+
+/* Command de un archivo — literal */
+.reveal .s11-slash-block {
+  display: block;
+  font-weight: 400;
+  max-width: 860px;
+  margin: 12px auto 0;
+  background: var(--bg-code);
+  border: 1px solid #2a3a5a;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-family: var(--font-mono);
+  font-size: 0.54em;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: left;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+.reveal .s11-slash-block .s11-code-key { color: var(--accent-secondary); }
+.reveal .s11-slash-block .s11-code-val { color: var(--text-primary); }
+.reveal .s11-slash-block .s11-code-fence { color: var(--text-muted); opacity: 0.7; }
+.reveal .s11-slash-tag {
+  display: block;
+  max-width: 860px;
+  margin-top: 12px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 0.56em;
+  color: var(--text-primary);
+  line-height: 1.55;
+  text-align: center;
+}
+.reveal .s11-slash-tag strong { color: var(--accent); }
+.reveal .s11-slash-tag code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+
+/* Demo */
+.reveal .s11-demo-sub {
+  max-width: 760px;
+  margin-top: 14px;
+  margin-bottom: 0;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 0.72em;
+  color: var(--text-muted);
+  font-style: italic;
+  text-align: center;
+}
+.reveal .s11-demo-wrap {
+  max-width: 1040px;
+  margin: 16px auto 0;
+}
+.reveal .s11-demo-wrap .cs-step { min-width: 0; }
+.reveal .s11-demo-wrap code { overflow-wrap: anywhere; }
+
+/* Cierre */
+.reveal .s11-close-card {
+  max-width: 740px;
+  margin: 18px auto 0;
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-top: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px 24px;
+  text-align: center;
+}
+.reveal .s11-close-main {
+  font-size: 0.64em;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+}
+.reveal .s11-close-main strong { color: var(--accent); }
+.reveal .s11-close-bridge {
+  font-size: 0.56em;
+  color: var(--text-muted);
+  line-height: 1.6;
+  border-top: 1px solid #2a3a5a;
+  padding-top: 11px;
+  margin: 0;
+}
+.reveal .s11-close-bridge em {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+</style>
+
+<!-- §11.1 · Apertura — Tarjeta de 5 preguntas (full opener) -->
+<section class="s11-slide">
+  <h2 class="s11-five-q-title">Skills y slash commands</h2>
+
+  <ol class="s11-five-q-grid">
+    <li class="s11-five-q-card is-active">
+      <span class="s11-five-q-num">1</span>
+      <span class="s11-five-q-label">Qué es</span>
+      <span class="s11-five-q-hint">definición en una línea</span>
+    </li>
+    <li class="s11-five-q-card">
+      <span class="s11-five-q-num">2</span>
+      <span class="s11-five-q-label">Dónde vive</span>
+      <span class="s11-five-q-hint">paths / niveles</span>
+    </li>
+    <li class="s11-five-q-card">
+      <span class="s11-five-q-num">3</span>
+      <span class="s11-five-q-label">Cuándo se carga</span>
+      <span class="s11-five-q-hint">momento + trigger</span>
+    </li>
+    <li class="s11-five-q-card">
+      <span class="s11-five-q-num">4</span>
+      <span class="s11-five-q-label">Cómo se usa</span>
+      <span class="s11-five-q-hint">sintaxis + ejemplos</span>
+    </li>
+  </ol>
+
+  <aside class="notes">
+    <p><strong>Ritmo rápido: no leer las cuatro preguntas.</strong></p>
+    <p><u>Apertura de §11. Quinta vuelta con la misma plantilla.</u></p>
+    <p><em>"Skills y slash commands. Quinta vuelta con la misma plantilla. Y un cambio de foco respecto a permisos: los permisos limitan qué tools puede usar el agente; las skills le dan procedimientos completos que de otra forma no tendría. Vamos con las cuatro preguntas de siempre."</em></p>
+  </aside>
+</section>
+
+<!-- §11.2 · Qué es — un mecanismo, dos formas -->
+<section class="s11-slide">
+  <ol class="s11-five-q-grid is-mini">
+    <li class="s11-five-q-card is-active"><span class="s11-five-q-num">1</span><span class="s11-five-q-label">Qué es</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">2</span><span class="s11-five-q-label">Dónde vive</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">3</span><span class="s11-five-q-label">Cuándo se carga</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">4</span><span class="s11-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Un mismo mecanismo, dos formas: skill y command</h2>
+
+  <ul class="s11-qe-list">
+    <li><strong>Skill:</strong> un directorio con <code>SKILL.md</code>. Empaqueta un procedimiento completo (frontmatter, fases, anti-patterns, archivos de soporte). Claude puede cargarla por su cuenta cuando la tarea matchea su <code>description</code>.</li>
+    <li><strong>Command:</strong> un solo archivo en <code>.claude/commands/</code>. Es la forma corta, ideal para un atajo que disparás vos.</li>
+    <li><strong>Las dos crean <code>/nombre</code>.</strong> El nombre sale del directorio o del archivo. Si una skill y un command se llaman igual, gana la skill.</li>
+    <li class="s11-qe-callout">→ La skill es la forma completa. El command es la forma de un archivo.</li>
+  </ul>
+
+  <aside class="notes">
+    <p><strong>Tres ítems y el callout; el tercero es el que se confunde.</strong></p>
+    <p><u>Skills y commands se fusionaron: son dos formas del mismo mecanismo.</u></p>
+    <p><em>"Primera pregunta: qué es. Mucha documentación vieja las presenta como dos cosas separadas, pero hoy son el mismo mecanismo con dos formas. Una skill es un directorio con un SKILL.md adentro: empaqueta un procedimiento completo, con frontmatter, fases, anti-patterns y, si hace falta, archivos de soporte al lado. Y tiene algo que la forma corta no aprovecha: Claude puede cargarla por su cuenta cuando la tarea que le pedís matchea su description. Un command es un solo archivo markdown en .claude/commands. Es la forma corta: un atajo que disparás vos. Las dos crean un slash command con el mismo formato, /nombre, y el nombre sale del directorio de la skill o del nombre del archivo. Si una skill y un command se llaman igual, gana la skill. La skill es la forma completa; el command, la forma de un archivo."</em></p>
+  </aside>
+</section>
+
+<!-- §11.3 · Dónde vive — tabla (skill / command × proyecto / usuario / plugins) -->
+<section class="s11-slide">
+  <ol class="s11-five-q-grid is-mini">
+    <li class="s11-five-q-card"><span class="s11-five-q-num">1</span><span class="s11-five-q-label">Qué es</span></li>
+    <li class="s11-five-q-card is-active"><span class="s11-five-q-num">2</span><span class="s11-five-q-label">Dónde vive</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">3</span><span class="s11-five-q-label">Cuándo se carga</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">4</span><span class="s11-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Dos formas, los mismos lugares</h2>
+
+  <div class="s11-matrix-wrap">
+    <table class="s11-matrix-table">
+      <thead>
+        <tr>
+          <th class="s11-matrix-rowhead">Forma</th>
+          <th>Proyecto</th>
+          <th>Usuario</th>
+          <th>Plugins</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="s11-matrix-rowname">Skill (directorio)</td>
+          <td><code>.claude/skills/&lt;nombre&gt;/SKILL.md</code></td>
+          <td><code>~/.claude/skills/&lt;nombre&gt;/SKILL.md</code></td>
+          <td>vía plugin instalado</td>
+        </tr>
+        <tr>
+          <td class="s11-matrix-rowname">Command (un archivo)</td>
+          <td><code>.claude/commands/&lt;nombre&gt;.md</code></td>
+          <td><code>~/.claude/commands/&lt;nombre&gt;.md</code></td>
+          <td>vía plugin instalado</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="s11-matrix-note">
+    Las de <strong>usuario</strong> sirven en cualquier proyecto. Las de <strong>proyecto</strong> se versionan con el repo. El repo del TP trae una de cada: la skill <code>agregar-juego</code> y los commands <code>explicar</code> y <code>pre-entrega</code>.
+  </p>
+
+  <aside class="notes">
+    <p><strong>Recorrer la tabla por filas.</strong></p>
+    <p><u>Mismo reparto user / proyecto que CLAUDE.md y settings.json.</u></p>
+    <p><em>"Segunda pregunta: dónde viven. Todo es markdown. La skill, en proyecto, es una carpeta dentro de .claude/skills con un SKILL.md adentro; en usuario, lo mismo bajo tu home. El command es un archivo suelto: .claude/commands/nombre.md en el proyecto, o bajo tu home. Y los dos pueden venir empaquetados en un plugin. La diferencia user versus proyecto es la misma que en CLAUDE.md y settings.json: lo de usuario viaja con vos de repo en repo; lo de proyecto se commitea y lo comparte el equipo. El repo del trabajo final trae una de cada forma: la skill agregar-juego, que abrimos en un momento, y dos comandos cortos, explicar y pre-entrega."</em></p>
+  </aside>
+</section>
+
+<!-- §11.3b · Equivalencias: la misma pieza en Codex y OpenCode (sin mini-strip) -->
+<section class="s11-slide">
+  <h2>Skills: acá los tres convergieron</h2>
+
+  <div class="harness-map is-large">
+    <div class="harness-map-col is-ref">
+      <span class="harness-map-tool">Claude Code</span>
+      <span class="harness-map-path">.claude/skills/</span>
+      <p class="harness-map-note">Comandos de un solo archivo en <code>.claude/commands/</code>.</p>
+    </div>
+    <div class="harness-map-col">
+      <span class="harness-map-tool">Codex</span>
+      <span class="harness-map-path">.agents/skills/</span>
+      <p class="harness-map-note">Se invoca con <code>$nombre</code>. Los custom prompts quedaron deprecados en favor de las skills.</p>
+    </div>
+    <div class="harness-map-col">
+      <span class="harness-map-tool">OpenCode</span>
+      <span class="harness-map-path">.opencode/skills/</span>
+      <p class="harness-map-note"><strong>También lee <code>.claude/skills/</code></strong>. Comandos de un archivo en <code>.opencode/commands/</code>.</p>
+    </div>
+  </div>
+
+  <p class="harness-map-foot">El mismo formato en los tres: una carpeta por skill con un <code>SKILL.md</code>, nombre y descripción en el frontmatter, procedimiento en el cuerpo.</p>
+
+  <aside class="notes">
+    <p><strong>La contracara de rules: acá hubo convergencia real.</strong></p>
+    <p><u>Skills en tres harness: mismo formato SKILL.md, carpetas distintas.</u></p>
+    <p><em>"Si rules era la pieza donde no coinciden, skills es donde más coinciden. Los tres usan el mismo formato: una carpeta por skill con un SKILL.md adentro, nombre y descripción arriba, el procedimiento abajo. Y el mismo mecanismo: al arrancar entra la descripción, el cuerpo entra cuando se usa. Cambia la carpeta. Codex las busca en .agents/skills, y deprecó sus custom prompts para empujar todo hacia skills. OpenCode tiene su carpeta, y además lee la de Claude Code directamente, así que las skills del repo del TP ya le sirven. Una skill bien escrita es de las piezas que mejor viajan entre herramientas."</em></p>
+  </aside>
+</section>
+
+<!-- §11.4 · Cuándo se carga — índice vs cuerpo -->
+<section class="s11-slide">
+  <ol class="s11-five-q-grid is-mini">
+    <li class="s11-five-q-card"><span class="s11-five-q-num">1</span><span class="s11-five-q-label">Qué es</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">2</span><span class="s11-five-q-label">Dónde vive</span></li>
+    <li class="s11-five-q-card is-active"><span class="s11-five-q-num">3</span><span class="s11-five-q-label">Cuándo se carga</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">4</span><span class="s11-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Al arranque entra el índice, no el procedimiento</h2>
+
+  <p class="s11-when-callout">
+    De cada skill, al arranque entra solo su nombre y su <code>description</code>. El cuerpo (fases, anti-patterns) entra cuando se invoca.
+  </p>
+
+  <ul class="s11-when-list">
+    <li><strong>En <code>/context</code> la ves listada</strong> con pocos tokens. Ese índice es lo que Claude usa para decidir si la carga por relevancia.</li>
+    <li><strong>El <code>SKILL.md</code> completo</strong> entra cuando escribís <code>/nombre</code> o cuando Claude decide que la tarea matchea el <code>description</code>. Entra a la <strong>misma ventana</strong>: la carga se difiere, no se aísla.</li>
+    <li><strong>Commands de un archivo:</strong> aparecen en el autocomplete al escribir <code>/</code>, y su cuerpo entra al invocarlos.</li>
+  </ul>
+
+  <p class="s11-when-bottom">
+    <strong>Diseño, no limitación.</strong> Con cinco skills instaladas pagás cinco descripciones cortas siempre, y el cuerpo solo de la que usás.
+  </p>
+
+  <aside class="notes">
+    <p><strong>Leer el callout marcando la asimetría índice / cuerpo.</strong></p>
+    <p><u>El cuerpo de una skill es opt-in por tarea, pero entra a la misma ventana.</u></p>
+    <p><em>"Tercera pregunta: cuándo se carga. Y es el punto que más importa de la sección. De cada skill instalada, al arranque entra solo el nombre y la description: un par de líneas, lo que Claude necesita para decidir si aplica. Las fases y los anti-patterns no entran. Si corrés /context apenas abrís la sesión, vas a ver las skills listadas con pocos tokens cada una: eso es el índice, no el cuerpo. El SKILL.md completo entra cuando escribís /nombre o cuando Claude decide, leyendo la description, que tu pedido la necesita. Y ojo con esto: entra a la misma ventana que todo lo demás. La skill difiere la carga; no aísla nada. Los commands de un archivo se comportan igual: aparecen en el autocomplete y su cuerpo entra cuando los invocás. Esto es diseño: con cinco skills instaladas pagás cinco descripciones cortas siempre y el cuerpo solo de la que usás. Comparalo con CLAUDE.md o las rules sin frontmatter, que cargan enteras desde el arranque."</em></p>
+  </aside>
+</section>
+
+<!-- §11.5 · Cómo se usa — walkthrough del SKILL.md de agregar-juego -->
+<section class="s11-slide">
+  <ol class="s11-five-q-grid is-mini">
+    <li class="s11-five-q-card"><span class="s11-five-q-num">1</span><span class="s11-five-q-label">Qué es</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">2</span><span class="s11-five-q-label">Dónde vive</span></li>
+    <li class="s11-five-q-card"><span class="s11-five-q-num">3</span><span class="s11-five-q-label">Cuándo se carga</span></li>
+    <li class="s11-five-q-card is-active"><span class="s11-five-q-num">4</span><span class="s11-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Anatomía de <code class="s11-h2-code">.claude/skills/agregar-juego/SKILL.md</code></h2>
+
+  <div class="s11-code-block"><span class="s11-code-fence">---</span>
+<span class="s11-code-key">name:</span> <span class="s11-code-val">agregar-juego</span>
+<span class="s11-code-key">description:</span> <span class="s11-code-val">Use when adding a new game to the platform — creating a Phaser scene, seeding the game in the database and wiring it to the game page. Covers the order of the steps and the verification in the browser.</span>
+<span class="s11-code-fence">---</span></div>
+
+  <ol class="s11-phases-list">
+    <li><strong>Definir el juego:</strong> slug, nombre y descripción, confirmados con el usuario. El slug aparece en cuatro lugares.</li>
+    <li><strong>Seed:</strong> la entrada en <code>GAMES</code> de <code>backend/main.py</code>; <code>seed_games()</code> es idempotente.</li>
+    <li><strong>La escena:</strong> <code>frontend/js/games/&lt;slug&gt;.js</code>, siguiendo la rule de escenas.</li>
+    <li><strong>Conectar la página:</strong> la entrada en <code>GAMES</code> de <code>frontend/js/game-page.js</code>.</li>
+    <li><strong>Verificar jugando:</strong> con el MCP de Playwright, jugar hasta perder y guardar un puntaje.</li>
+  </ol>
+
+  <p class="s11-anti-card">
+    <strong>Anti-patterns:</strong> escribir la escena antes del seed · hacer <code>fetch</code> desde la escena · dar por hecho que anda porque la página no muestra errores · cambiar el slug a mitad de camino.
+  </p>
+
+  <aside class="notes">
+    <p><strong>Frontmatter, seis fases, anti-patterns: arriba a abajo.</strong></p>
+    <p><u>El comando /agregar-juego sale del nombre del directorio; name es solo etiqueta.</u></p>
+    <p><em>"Cuarta pregunta: cómo se usa. Abrimos la skill agregar-juego del repo del trabajo final. Arriba, el frontmatter. El name es una etiqueta; el comando /agregar-juego sale del nombre del directorio. La description es la frase que Claude lee para decidir si la skill aplica, y sigue una convención: 'Use when X'. Una description vaga activa mal. Abajo, el cuerpo: cinco fases, y el orden es lo que más vale. Primero definir slug, nombre y descripción, confirmados conmigo, porque el slug aparece en cuatro lugares y renombrarlo después sale caro. Segundo el seed en el backend. Tercero la escena, que sigue la rule de escenas que ya vimos. Cuarto conectar la página. Y quinto verificar jugando con el MCP de Playwright, que en este proyecto reemplaza a los tests. Al final, en rojo, los anti-patterns: escribir la escena antes del seed, hacer fetch desde la escena, o dar por terminado porque la página no muestra errores. Eso convierte 'esperar que Claude se acuerde' en 'tenerlo escrito'."</em></p>
+  </aside>
+</section>
+
+<!-- §11.6 · La forma de un archivo — explicar.md -->
+<section class="s11-slide">
+  <h2>La forma de un archivo: <code class="s11-h2-code">.claude/commands/explicar.md</code></h2>
+
+  <div class="s11-slash-block"><span class="s11-code-fence">---</span>
+<span class="s11-code-key">description:</span> <span class="s11-code-val">Explica en cinco líneas qué hace un archivo del proyecto y quién lo llama</span>
+<span class="s11-code-key">argument-hint:</span> <span class="s11-code-val">&lt;ruta/al/archivo&gt;</span>
+<span class="s11-code-key">disable-model-invocation:</span> <span class="s11-code-val">true</span>
+<span class="s11-code-fence">---</span>
+
+Leé `$1` y explicame, en no más de cinco líneas:
+
+- qué hace,
+- quién lo llama y a quién llama él,
+- qué convención del proyecto hay que respetar si lo toco.
+
+No propongas cambios ni edites nada.
+
+Si no recibiste una ruta, pedímela antes de responder.</div>
+
+  <p class="s11-slash-tag">
+    <strong>Quince líneas, sin fases y sin verificación.</strong> No es un procedimiento: es una pregunta que hacés seguido, escrita una vez. <code>$1</code> toma lo que escribís después del comando, y <code>disable-model-invocation</code> hace que <strong>solo vos</strong> puedas dispararlo: su descripción ni siquiera entra al contexto.
+  </p>
+
+  <aside class="notes">
+    <p><strong>El contraste con la skill está en las tres líneas del frontmatter, no en el largo.</strong></p>
+    <p><u>Zoom-in sin mini-strip: atajo parametrizado contra procedimiento con fases.</u></p>
+    <p><em>"Y esta es la otra forma. Punto claude, barra commands, barra explicar punto md. Un archivo, quince líneas, y fíjense que no tiene fases, ni orden, ni verificación, ni anti-patterns: no es un procedimiento, es una pregunta que hago seguido y escribí una vez. El frontmatter tiene tres cosas. La description, que es lo que ves en el autocomplete. El argument-hint, que te recuerda qué va después del comando: /explicar frontend/js/score-panel.js, y esa ruta entra al cuerpo por el dólar uno. Y la tercera, que es la que más me gusta para entender la diferencia: disable-model-invocation en true. Eso significa que Claude no puede invocarlo solo, y va más lejos: la descripción ni siquiera entra al contexto, así que el agente no sabe que existe. Comparalo con la skill: la skill paga su descripción en la ventana desde que arranca la sesión, porque Claude tiene que poder decidir usarla. Este comando no cuesta nada hasta que lo tipeás. Ahí está el criterio: si querés que el agente lo elija, skill; si es un atajo tuyo, y más si tiene efectos que querés controlar, comando. La última línea del cuerpo, 'si no recibiste una ruta, pedímela', está porque si lo invocás sin argumento el dólar uno queda vacío."</em></p>
+  </aside>
+</section>
+
+<!-- §11.8 · Demo · la skill entra por relevancia (section-divider + clickable-steps) -->
+<section class="section-divider">
+  <h2>Demo · la skill entra por relevancia</h2>
+  <p class="s11-demo-sub">Misma tarea con la skill y sin ella: qué fases aparecen en cada caso.</p>
+
+  <div class="s11-demo-wrap">
+    <div id="s11-demo-steps"></div>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Tres pasos: índice, activación por relevancia, contraste sin skill.</strong></p>
+    <p><u>Setup completo abajo; hacerlo antes de la clase.</u></p>
+    <p><em>"Vamos al demo. Una tarea que entra justo en las fases de la skill: sumar un juego nuevo a la plataforma. Primero miramos qué cargó la sesión, después lo pedimos en prosa y vemos si la skill entra sola, y al final repetimos el pedido en una copia del repo sin la skill. No vamos a terminar el juego en vivo: alcanza con ver el orden en el que encara el trabajo."</em></p>
+    <hr>
+    <p><strong>Acciones (copiables):</strong></p>
+    <p><strong>Setup (antes de la clase)</strong></p>
+    <ol>
+      <li>Copiar <code>semanas/00/source_material/apellido-iisaia/tp-final/</code> a <code>~/tp-final-demo</code> (fuera del repo del curso).</li>
+      <li><code>cd ~/tp-final-demo &amp;&amp; git init &amp;&amp; git add -A &amp;&amp; git commit -m "estado inicial"</code> (hace falta para <code>git status</code> / <code>git checkout .</code>).</li>
+      <li><code>uv sync</code> y dejar la app levantada en otra terminal, para el paso de verificación.</li>
+      <li>Abrir Claude Code con <code>claude --permission-mode default</code>: en Pro/Max/Team el modo de arranque es <code>auto</code>, que taparía los prompts de permiso. En la UI, <code>default</code> se llama Manual.</li>
+      <li>Para ver qué cargó el runtime: <code>/context</code> (no <code>/memory</code>, que lista ubicaciones posibles aunque no existan).</li>
+      <li>Ojo en vivo: el <code>~/.claude/CLAUDE.md</code> y las rules de usuario del profesor también aparecen como fuentes.</li>
+    </ol>
+    <p><strong>Paso 1 · La skill está en el índice</strong></p>
+    <ul>
+      <li><strong>Setup:</strong> sesión nueva en <code>~/tp-final-demo</code></li>
+      <li><strong>En Claude:</strong> <code>/context</code></li>
+      <li><strong>Mirar:</strong> <code>agregar-juego</code> listada entre las skills</li>
+      <li><strong>Mirar:</strong> las fases todavía no están</li>
+    </ul>
+    <p><strong>Paso 2 · Pedido en prosa</strong></p>
+    <ul>
+      <li><strong>En Claude:</strong> "quiero sumar un juego nuevo a la plataforma, un Pong de un jugador"</li>
+      <li><strong>Mirar:</strong> carga <code>agregar-juego</code> sin que la nombres</li>
+      <li><strong>Mirar:</strong> pregunta slug, nombre y descripción → seed → escena → página → verificación</li>
+    </ul>
+    <p><strong>Paso 3 · Sin la skill</strong></p>
+    <ul>
+      <li><strong>Terminal:</strong> <code>cp -r ~/tp-final-demo ~/tp-final-sin-skill &amp;&amp; cd ~/tp-final-sin-skill</code></li>
+      <li><strong>Terminal:</strong> <code>git checkout . &amp;&amp; git clean -fd &amp;&amp; rm -rf .claude/skills</code></li>
+      <li><strong>Terminal:</strong> <code>claude --permission-mode default</code></li>
+      <li><strong>En Claude:</strong> el mismo pedido</li>
+      <li><strong>Mirar:</strong> qué fases aparecen y cuáles no</li>
+    </ul>
+    <p>En el Paso 2, Claude pregunta slug, nombre y descripción: respondé <code>pong</code>, "Pong" y una línea. Cortá cuando termine el seed y empiece la escena; el resto del procedimiento ya se ve en el SKILL.md.</p>
+    <p><strong>Contraste parcial:</strong></p>
+    <p>Sin la skill siguen cargados los CLAUDE.md y las rules: al tocar un archivo de <code>frontend/js/games/</code> entra <code>escenas-de-juego.md</code> y el agente igual usa <code>onKeys()</code>. Lo que cambia es el orden: sin el procedimiento escrito suele arrancar por la escena y dejar el seed para el final, que es justo el anti-pattern. El <code>git checkout . &amp;&amp; git clean -fd</code> descarta en la copia lo que Claude hizo en el Paso 2. Si <code>uv</code> se queja del <code>.venv</code> copiado, correr <code>uv sync</code>.</p>
+    <p><strong>Plan B:</strong></p>
+    <p>Si en el Paso 2 la skill no entra por relevancia, invocarla directo: <code>/agregar-juego un Pong de un jugador</code>. El procedimiento que se ve es el mismo.</p>
+  </aside>
+</section>
+
+<!-- §11.9 · Cierre + bridge a §12 -->
+<section class="s11-slide">
+  <h2>Una skill difiere la carga de un procedimiento</h2>
+
+  <div class="s11-close-card">
+    <p class="s11-close-main">
+      Una skill <strong>empaqueta un procedimiento</strong>: fases, anti-patterns y archivos de soporte. Al arranque pagás solo su descripción; el cuerpo entra a la ventana <strong>cuando se invoca</strong>. El modelo lo sigue con mucha más consistencia, y vos podés <strong>auditar cada fase</strong>.
+    </p>
+    <p class="s11-close-bridge">
+      La skill difiere la carga dentro de <em>la misma ventana</em>. Un sub-agent trabaja en <em>otra ventana</em>: lo que explora no vuelve al padre.
+    </p>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Apoyar "difiere la carga" y "otra ventana".</strong></p>
+    <p><u>Cierre de §11 y bridge a §12: diferir la carga vs aislar.</u></p>
+    <p><em>"Cerramos. Una skill empaqueta un procedimiento: fases, anti-patterns, archivos de soporte. Al arranque pagás solo la descripción; el cuerpo entra cuando se invoca. Y no es magia ni garantía: el modelo lo sigue con mucha más consistencia y vos tenés contra qué auditar. Pero fijate dónde entra el cuerpo: en la misma ventana. La skill difiere la carga; no aísla. Lo que sigue es la pieza que sí aísla: un sub-agent corre en otra ventana, y lo que lee para resolver la tarea no vuelve a la tuya."</em></p>
+  </aside>
+</section>
+
+<!-- INIT-SCRIPTS-§11-START -->
+<script>
+  initClickableSteps({containerId: 's11-demo-steps', steps: [
+    {
+      title: 'Paso 1 · La skill está en el índice',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>Setup:</strong> sesión nueva en <code>~/tp-final-demo</code></li><li><strong>En Claude:</strong> <code>/context</code></li><li><strong>Mirar:</strong> <code>agregar-juego</code> listada entre las skills</li><li><strong>Mirar:</strong> las fases todavía no están</li></ul>',
+      example: '<code>/context</code> lista <code>agregar-juego</code> entre las skills con pocos tokens: nombre y descripción. Las cinco fases y los anti-patterns del <code>SKILL.md</code> todavía no ocupan la ventana.'
+    },
+    {
+      title: 'Paso 2 · Pedido en prosa',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>En Claude:</strong> "quiero sumar un juego nuevo a la plataforma, un Pong de un jugador"</li><li><strong>Mirar:</strong> carga <code>agregar-juego</code> sin que la nombres</li><li><strong>Mirar:</strong> slug y nombre → seed → escena → página → verificación</li></ul>',
+      example: 'Claude detecta que el pedido matchea la <code>description</code> y carga la skill. Pregunta el slug, el nombre y la descripción antes de tocar nada, agrega la entrada al <code>GAMES</code> del backend y recién entonces escribe la escena. El orden no lo improvisa: lo lee del <code>SKILL.md</code>.'
+    },
+    {
+      title: 'Paso 3 · Sin la skill',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>Terminal:</strong> <code>cp -r ~/tp-final-demo ~/tp-final-sin-skill &amp;&amp; cd ~/tp-final-sin-skill</code></li><li><strong>Terminal:</strong> <code>git checkout . &amp;&amp; git clean -fd &amp;&amp; rm -rf .claude/skills</code></li><li><strong>Terminal:</strong> <code>claude --permission-mode default</code></li><li><strong>En Claude:</strong> el mismo pedido</li><li><strong>Mirar:</strong> qué fases aparecen y cuáles no</li></ul>',
+      example: 'Sin la skill, Claude resuelve con los CLAUDE.md y las rules, que cubren parte: al tocar un archivo de juegos entra la rule de escenas y usa <code>onKeys()</code> igual. Lo que queda librado a cada corrida es el orden, y suele arrancar por la escena en vez del seed.'
+    }
+  ]});
+</script>
+<!-- INIT-SCRIPTS-§11-END -->

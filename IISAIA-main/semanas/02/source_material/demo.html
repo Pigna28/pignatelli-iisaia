@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conceptos del Frontend — una página que se enseña a sí misma</title>
+  <style>
+    /* === Variables (theming) === */
+    :root {
+      --color-bg: #0f172a;
+      --color-surface: #1e293b;
+      --color-surface-2: #334155;
+      --color-text: #e2e8f0;
+      --color-muted: #94a3b8;
+      --color-accent: #f59e0b;
+      --color-accent-soft: rgba(245, 158, 11, 0.15);
+      --color-success: #10b981;
+      --color-warn: #f59e0b;
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 48px;
+      --radius: 12px;
+      --radius-sm: 6px;
+      --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+      --transition: 200ms ease;
+    }
+
+    /* === Reset + base === */
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+    }
+    h1, h2, h3 { line-height: 1.2; margin-top: 0; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.75rem; color: var(--color-accent); }
+    h3 { font-size: 1.2rem; }
+    p { margin: 0 0 var(--space-md) 0; }
+    code {
+      font-family: var(--font-mono);
+      background: var(--color-surface);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9em;
+    }
+    button {
+      font-family: inherit;
+      font-size: 0.95rem;
+      background: var(--color-accent);
+      color: white;
+      border: none;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    button:hover { background: #d97706; }
+    button.secondary {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+    }
+    button.secondary:hover { background: #475569; }
+
+    /* === Layout === */
+    .hero {
+      padding: var(--space-xl) var(--space-lg);
+      max-width: 900px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .hero p {
+      color: var(--color-muted);
+      font-size: 1.15rem;
+      max-width: 600px;
+      margin: 0 auto var(--space-lg) auto;
+    }
+    .hero nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      justify-content: center;
+      margin-top: var(--space-lg);
+    }
+    .hero nav a {
+      color: var(--color-text);
+      background: var(--color-surface);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background var(--transition);
+    }
+    .hero nav a:hover { background: var(--color-surface-2); }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg) var(--space-xl);
+    }
+    section.demo-section {
+      background: var(--color-surface);
+      border-radius: var(--radius);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+    section.demo-section h2 {
+      margin-bottom: var(--space-md);
+    }
+    section.demo-section .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+    section.demo-section .section-header h2 {
+      margin-bottom: 0;
+    }
+    .section-body[hidden] { display: none; }
+
+    /* §3 + §4 paired side-by-side: estado feeds the dom tree, so it
+       helps to see them together as the user clicks. */
+    .estado-dom-pair {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-bottom: var(--space-xl);
+    }
+    .estado-dom-pair > section.demo-section {
+      flex: 1 1 320px;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+    section.demo-section .lead {
+      color: var(--color-muted);
+      margin-bottom: var(--space-lg);
+    }
+    .demo-area {
+      background: var(--color-bg);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--color-muted);
+      padding: var(--space-lg);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--color-surface);
+      margin-top: var(--space-xl);
+    }
+
+    /* === §1 Estructura === */
+    .estructura-controls {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-md);
+    }
+    .estructura-controls button.active {
+      outline: 2px solid var(--color-text);
+    }
+    #estructura-render article,
+    #estructura-render .article-fake {
+      background: var(--color-surface-2);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+    }
+    #estructura-render header h3,
+    #estructura-render .title-fake {
+      margin: 0 0 var(--space-md) 0;
+      color: var(--color-accent);
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    #estructura-render nav,
+    #estructura-render .nav-fake { margin: var(--space-sm) 0; }
+    #estructura-render nav a,
+    #estructura-render .nav-fake a {
+      color: var(--color-accent);
+      margin-right: var(--space-md);
+      text-decoration: none;
+    }
+    #estructura-render nav a:hover,
+    #estructura-render .nav-fake a:hover { text-decoration: underline; }
+    #estructura-render section,
+    #estructura-render .section-fake {
+      margin-top: var(--space-md);
+    }
+    #estructura-render footer,
+    #estructura-render .footer-fake {
+      margin-top: var(--space-md);
+      color: var(--color-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--color-surface);
+      padding: var(--space-sm) 0 0 0;
+      text-align: left;
+    }
+    .estructura-source {
+      background: var(--color-bg);
+      border: 1px solid var(--color-surface-2);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      margin-top: var(--space-md);
+    }
+
+    /* === §2 Estilo === */
+    .estilo-controls {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-md);
+    }
+    .estilo-controls button.active { outline: 2px solid var(--color-text); }
+    .flex-playground {
+      display: flex;
+      justify-content: flex-start;
+      gap: var(--space-sm);
+      background: var(--color-surface-2);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      min-height: 80px;
+      transition: justify-content var(--transition);
+    }
+    .flex-item {
+      background: var(--color-accent);
+      color: white;
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+    .estilo-current {
+      color: var(--color-muted);
+      margin-top: var(--space-sm);
+      font-size: 0.9rem;
+    }
+
+    /* Box model demo */
+    .bm-controls {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .bm-control-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+    .bm-control-row > .bm-label {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--color-muted);
+      min-width: 80px;
+    }
+    .bm-control-row button {
+      font-size: 0.85rem;
+      padding: 4px 12px;
+    }
+    .bm-stage {
+      background: var(--color-surface-2);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 120px;
+    }
+    .bm-button {
+      background: var(--color-accent);
+      color: white;
+      border-style: solid;
+      border-color: white;
+      font-weight: 600;
+      cursor: default;
+      transition: padding var(--transition), border-width var(--transition), margin var(--transition), border-radius var(--transition);
+    }
+
+    /* Grid demo */
+    .grid-playground {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-sm);
+      background: var(--color-surface-2);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      transition: grid-template-columns var(--transition);
+    }
+    .grid-item {
+      background: var(--color-accent);
+      color: white;
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* Tipografía demo */
+    .typo-stage {
+      background: var(--color-surface-2);
+      padding: var(--space-lg);
+      border-radius: var(--radius-sm);
+    }
+    .typo-stage h4.typo-heading {
+      margin: 0 0 var(--space-sm) 0;
+      color: var(--color-text);
+      font-size: 1.5rem;
+    }
+    .typo-stage p.typo-body {
+      margin: 0;
+      color: var(--color-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* === Combo demo: las 4 primitivas juntas === */
+    .combo-stage {
+      /* Variables locales — un preset cambia todas a la vez */
+      --combo-bg: #0f172a;
+      --combo-text: #e2e8f0;
+      --combo-accent: #6366f1;
+      --combo-muted: #94a3b8;
+      --combo-cards-cols: 1fr 1fr 1fr;
+      --combo-card-padding: 16px;
+      --combo-card-border-width: 1px;
+      --combo-card-border-color: #334155;
+      --combo-card-radius: 6px;
+      --combo-heading-font: system-ui, -apple-system, sans-serif;
+      --combo-body-font: system-ui, -apple-system, sans-serif;
+
+      background: var(--combo-bg);
+      color: var(--combo-text);
+      padding: 24px;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition), color var(--transition);
+    }
+    .combo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-md);
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--combo-card-border-color);
+    }
+    .combo-title {
+      margin: 0;
+      font-family: var(--combo-heading-font);
+      font-size: 1.4rem;
+      color: var(--combo-text);
+    }
+    .combo-nav {
+      display: flex;
+      gap: 14px;
+    }
+    .combo-nav a {
+      color: var(--combo-accent);
+      font-family: var(--combo-body-font);
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: default;
+    }
+    .combo-cards {
+      display: grid;
+      grid-template-columns: var(--combo-cards-cols);
+      gap: 12px;
+    }
+    .combo-card {
+      padding: var(--combo-card-padding);
+      border: var(--combo-card-border-width) solid var(--combo-card-border-color);
+      border-radius: var(--combo-card-radius);
+      font-family: var(--combo-body-font);
+      transition: padding var(--transition), border-radius var(--transition), border-width var(--transition);
+    }
+    .combo-card h5 {
+      margin: 0 0 6px 0;
+      font-family: var(--combo-heading-font);
+      color: var(--combo-text);
+      font-size: 1rem;
+    }
+    .combo-card p {
+      margin: 0 0 10px 0;
+      color: var(--combo-muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+    .combo-cta {
+      background: var(--combo-accent);
+      color: var(--combo-bg);
+      font-family: var(--combo-body-font);
+      padding: 6px 14px;
+      border: none;
+      border-radius: var(--combo-card-radius);
+      font-weight: 600;
+      cursor: default;
+      font-size: 0.85rem;
+    }
+    .combo-presets {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+      margin-bottom: var(--space-md);
+    }
+
+    /* === §3 Estado === */
+    .estado-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--space-md);
+    }
+    .estado-demo {
+      background: var(--color-bg);
+      padding: var(--space-md);
+      border-radius: var(--radius-sm);
+    }
+    .estado-demo h3 { margin-top: 0; color: var(--color-text); }
+    .estado-state { color: var(--color-muted); font-size: 0.85rem; }
+    .estado-controls { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+    .counter-display {
+      display: block;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--color-accent);
+      margin: var(--space-sm) 0;
+    }
+    .todo-form {
+      display: flex;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-sm);
+    }
+    .todo-form input {
+      flex: 1;
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      border: 1px solid var(--color-surface-2);
+      border-radius: var(--radius-sm);
+      padding: var(--space-xs) var(--space-sm);
+      font-family: inherit;
+    }
+    .todo-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+    .todo-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-xs) var(--space-sm);
+      background: var(--color-surface-2);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--space-xs);
+      font-size: 0.9rem;
+    }
+    .todo-list button {
+      background: transparent;
+      color: var(--color-muted);
+      padding: 0 var(--space-xs);
+    }
+    .todo-list button:hover { color: var(--color-warn); background: transparent; }
+    .event-target {
+      /* override <button> defaults so it looks like the original "drop-zone" */
+      display: block;
+      width: 100%;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--color-text);
+      background: var(--color-accent-soft);
+      border: 1px dashed var(--color-accent);
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: var(--space-sm);
+    }
+    .event-target:hover {
+      background: var(--color-accent-soft);
+    }
+    .event-log {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 120px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--color-muted);
+    }
+    .event-log li { padding: 2px 0; border-bottom: 1px solid var(--color-surface); }
+
+    /* === §4 DOM === */
+    .dom-tree, .dom-tree ul {
+      list-style: none;
+      padding-left: var(--space-md);
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+    }
+    .dom-tree li {
+      padding: 2px 0;
+      cursor: pointer;
+      color: var(--color-muted);
+      transition: color var(--transition);
+    }
+    .dom-tree li:hover > .dom-label { color: var(--color-accent); }
+    .dom-label {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .dom-label .tag { color: var(--color-accent); }
+    .dom-label .id { color: var(--color-warn); }
+    .dom-label .cls { color: var(--color-success); }
+    .dom-highlight {
+      outline: 2px dashed var(--color-warn) !important;
+      outline-offset: 4px;
+    }
+
+    /* === §5 Single-file === */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-md);
+    }
+    .modal[hidden] { display: none; }
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+    }
+    .modal-panel {
+      position: relative;
+      background: var(--color-surface);
+      border-radius: var(--radius);
+      max-width: 1000px;
+      width: 100%;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md);
+      border-bottom: 1px solid var(--color-surface-2);
+    }
+    .modal-header h3 { margin: 0; }
+    .modal-panel pre {
+      margin: 0;
+      padding: var(--space-md);
+      overflow: auto;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--color-muted);
+      line-height: 1.5;
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Conceptos del Frontend</h1>
+    <p>Explorá una página que se enseña a sí misma. Cada sección demuestra un concepto y al mismo tiempo está construida con ese concepto.</p>
+    <nav>
+      <a href="#estructura">Estructura</a>
+      <a href="#estilo">Estilo</a>
+      <a href="#estado">Estado</a>
+      <a href="#dom">DOM</a>
+      <a href="#single-file">Single-file</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="demo-section" id="estructura">
+      <div class="section-header">
+        <h2>1. Estructura — HTML semántico</h2>
+        <button class="toggle-section secondary" data-target="estructura-body">Mostrar</button>
+      </div>
+      <div class="section-body" id="estructura-body" hidden>
+        <p class="lead">Las etiquetas son sustantivos. La página entiende de qué trata por los nombres.</p>
+        <div class="estructura-controls">
+          <button id="btn-semantic" class="active">Semántico</button>
+          <button id="btn-divsoup" class="secondary">Sopa de divs</button>
+          <button id="btn-show-source" class="secondary">Ver código</button>
+        </div>
+        <div class="demo-area" id="estructura-render"></div>
+        <pre class="estructura-source" id="estructura-source" hidden></pre>
+      </div>
+    </section>
+
+    <section class="demo-section" id="estilo">
+      <div class="section-header">
+        <h2>2. Estilo — Layout y variables CSS</h2>
+        <button class="toggle-section secondary" data-target="estilo-body">Mostrar</button>
+      </div>
+      <div class="section-body" id="estilo-body" hidden>
+        <p class="lead">El CSS responde a "cómo se ven". Cuatro primitivas alcanzan para dirigir a una IA: caja, layout, tipografía y variables.</p>
+
+        <!-- Primitiva 1 — Box model -->
+        <h3>Primitiva 1 — Box model (padding · border · margin)</h3>
+        <div class="bm-controls">
+          <div class="bm-control-row">
+            <span class="bm-label">padding</span>
+            <button data-bm="padding" data-value="2px 6px" class="secondary">chico</button>
+            <button data-bm="padding" data-value="10px 20px" class="active">medio</button>
+            <button data-bm="padding" data-value="18px 32px" class="secondary">grande</button>
+          </div>
+          <div class="bm-control-row">
+            <span class="bm-label">border</span>
+            <button data-bm="border-width" data-value="1px" class="secondary">fino</button>
+            <button data-bm="border-width" data-value="3px" class="active">medio</button>
+            <button data-bm="border-width" data-value="6px" class="secondary">grueso</button>
+          </div>
+          <div class="bm-control-row">
+            <span class="bm-label">margin</span>
+            <button data-bm="margin" data-value="0" class="secondary">cero</button>
+            <button data-bm="margin" data-value="8px 0" class="active">medio</button>
+            <button data-bm="margin" data-value="24px 0" class="secondary">grande</button>
+          </div>
+          <div class="bm-control-row">
+            <span class="bm-label">border-radius</span>
+            <button data-bm="border-radius" data-value="0" class="secondary">recto</button>
+            <button data-bm="border-radius" data-value="6px" class="active">medio</button>
+            <button data-bm="border-radius" data-value="20px" class="secondary">redondo</button>
+          </div>
+        </div>
+        <div class="bm-stage">
+          <button class="bm-button">Aceptar</button>
+          <button class="bm-button">Aceptar</button>
+        </div>
+        <p class="estilo-current"><code id="bm-current">padding: 10px 20px; border: 3px solid; margin: 8px 0; border-radius: 6px;</code></p>
+
+        <!-- Primitiva 2 — Layout (Flex + Grid) -->
+        <h3 style="margin-top: var(--space-lg)">Primitiva 2 — Layout: Flexbox</h3>
+        <div class="estilo-controls">
+          <button data-jc="flex-start" class="jc-btn active">flex-start</button>
+          <button data-jc="center" class="jc-btn secondary">center</button>
+          <button data-jc="space-between" class="jc-btn secondary">space-between</button>
+          <button data-jc="space-around" class="jc-btn secondary">space-around</button>
+          <button data-jc="flex-end" class="jc-btn secondary">flex-end</button>
+        </div>
+        <div class="demo-area">
+          <div class="flex-playground" id="flex-playground">
+            <div class="flex-item">A</div>
+            <div class="flex-item">B</div>
+            <div class="flex-item">C</div>
+          </div>
+          <p class="estilo-current"><code id="flex-current">justify-content: flex-start</code></p>
+        </div>
+
+        <h3 style="margin-top: var(--space-lg)">Primitiva 2 — Layout: Grid</h3>
+        <div class="estilo-controls">
+          <button data-gtc="1fr" class="gtc-btn secondary">1 columna</button>
+          <button data-gtc="1fr 1fr" class="gtc-btn secondary">2 columnas</button>
+          <button data-gtc="1fr 1fr 1fr" class="gtc-btn active">3 columnas</button>
+          <button data-gtc="repeat(auto-fit, minmax(80px, 1fr))" class="gtc-btn secondary">auto-fit</button>
+        </div>
+        <div class="demo-area">
+          <div class="grid-playground" id="grid-playground">
+            <div class="grid-item">A</div>
+            <div class="grid-item">B</div>
+            <div class="grid-item">C</div>
+            <div class="grid-item">D</div>
+            <div class="grid-item">E</div>
+            <div class="grid-item">F</div>
+          </div>
+          <p class="estilo-current"><code id="grid-current">grid-template-columns: 1fr 1fr 1fr</code></p>
+        </div>
+
+        <!-- Primitiva 3 — Tipografía -->
+        <h3 style="margin-top: var(--space-lg)">Primitiva 3 — Tipografía</h3>
+        <div class="estilo-controls">
+          <button data-typo="sans" class="typo-btn active">Sans para todo</button>
+          <button data-typo="pair" class="typo-btn secondary">Serif heading + Sans body</button>
+          <button data-typo="mono" class="typo-btn secondary">Mono para todo</button>
+        </div>
+        <div class="typo-stage">
+          <h4 class="typo-heading" id="typo-heading">El frontend importa</h4>
+          <p class="typo-body" id="typo-body">Cuando la IA escribe el código, vos no escribís sintaxis: dirigís decisiones. Los nombres importan.</p>
+        </div>
+        <p class="estilo-current"><code id="typo-current">heading: sans-serif · body: sans-serif</code></p>
+
+        <!-- Primitiva 4 — Variables CSS -->
+        <h3 style="margin-top: var(--space-lg)">Primitiva 4 — Variables CSS (theme switcher)</h3>
+        <div class="estilo-controls">
+          <button data-accent="#6366f1" class="theme-btn secondary" style="background:#6366f1">Indigo</button>
+          <button data-accent="#10b981" class="theme-btn secondary" style="background:#10b981">Esmeralda</button>
+          <button data-accent="#f59e0b" class="theme-btn active" style="background:#f59e0b">Ámbar</button>
+          <button data-accent="#ef4444" class="theme-btn secondary" style="background:#ef4444">Rojo</button>
+        </div>
+        <p class="estilo-current"><code id="theme-current">--color-accent: #f59e0b</code></p>
+
+        <!-- Todo junto — las 4 primitivas combinadas -->
+        <h3 style="margin-top: var(--space-lg)">Todo junto — las 4 primitivas combinadas</h3>
+        <p style="color: var(--color-muted); margin-bottom: var(--space-md);">El mismo HTML, cambiando todas las primitivas a la vez. Tocá un preset y mirá cómo se transforma toda la identidad del sitio:</p>
+        <div class="combo-presets">
+          <button data-preset="tech" class="combo-btn active">Minimal tech</button>
+          <button data-preset="editorial" class="combo-btn secondary">Editorial cálida</button>
+          <button data-preset="pop" class="combo-btn secondary">Pop colorido</button>
+          <button data-preset="brutal" class="combo-btn secondary">Brutalismo monospace</button>
+        </div>
+        <div class="combo-stage" id="combo-stage">
+          <header class="combo-header">
+            <h4 class="combo-title">Recetas de la abuela</h4>
+            <nav class="combo-nav">
+              <a>Inicio</a>
+              <a>Recetas</a>
+              <a>Sobre mí</a>
+            </nav>
+          </header>
+          <div class="combo-cards">
+            <article class="combo-card">
+              <h5>Tarta de manzana</h5>
+              <p>Receta familiar, hace 30 años en mi casa.</p>
+              <button class="combo-cta">Leer</button>
+            </article>
+            <article class="combo-card">
+              <h5>Pan casero</h5>
+              <p>Masa madre, fermentación lenta.</p>
+              <button class="combo-cta">Leer</button>
+            </article>
+            <article class="combo-card">
+              <h5>Ñoquis del 29</h5>
+              <p>Tradición rioplatense con papa.</p>
+              <button class="combo-cta">Leer</button>
+            </article>
+          </div>
+        </div>
+        <p class="estilo-current" id="combo-current" style="font-family: var(--font-mono); font-size: 0.75rem; line-height: 1.5;">
+          tipografía: sans · grid: 3 col · accent: #6366f1 · padding: 16px · border: 1px · radius: 6px
+        </p>
+      </div>
+    </section>
+
+    <div class="estado-dom-pair">
+    <section class="demo-section" id="estado">
+      <div class="section-header">
+        <h2>3. Estado y comportamiento</h2>
+        <button class="toggle-section secondary" data-target="estado-body">Mostrar</button>
+      </div>
+      <div class="section-body" id="estado-body" hidden>
+      <p class="lead">Estado es el dato detrás. DOM es lo que ves. Eventos son el puente.</p>
+      <div class="estado-grid">
+        <article class="estado-demo">
+          <h3>Contador</h3>
+          <p class="estado-state">estado: <code id="counter-state">count = 0</code></p>
+          <output class="counter-display" id="counter-display">0</output>
+          <div class="estado-controls">
+            <button id="counter-dec" class="secondary">−1</button>
+            <button id="counter-inc">+1</button>
+            <button id="counter-reset" class="secondary">reset</button>
+          </div>
+        </article>
+
+        <article class="estado-demo">
+          <h3>Todo list</h3>
+          <p class="estado-state">estado: <code id="todo-state">items = []</code></p>
+          <form id="todo-form" class="todo-form">
+            <input type="text" id="todo-input" placeholder="Nueva tarea..." required>
+            <button type="submit">+</button>
+          </form>
+          <ul class="todo-list" id="todo-list"></ul>
+        </article>
+
+        <article class="estado-demo">
+          <h3>Event log</h3>
+          <p class="estado-state">cualquier click se registra abajo</p>
+          <button type="button" class="event-target" id="event-target">Hacé click acá</button>
+          <ol class="event-log" id="event-log"></ol>
+        </article>
+      </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="dom">
+      <div class="section-header">
+        <h2>4. El DOM — el árbol vivo</h2>
+        <button class="toggle-section secondary" data-target="dom-body">Mostrar</button>
+      </div>
+      <div class="section-body" id="dom-body" hidden>
+        <p class="lead">El HTML es texto. El DOM es la representación viva en la memoria del navegador.</p>
+        <p>Estás mirando el árbol del DOM de la sección §3 (estado y comportamiento). Cuando agregás o borrás items en el todo, este árbol se actualiza solo. Pasá el mouse sobre un nodo para resaltarlo arriba.</p>
+        <div class="demo-area">
+          <ul class="dom-tree" id="dom-tree"></ul>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <section class="demo-section" id="single-file">
+      <div class="section-header">
+        <h2>5. Single-file: todo en un archivo</h2>
+        <button class="toggle-section secondary" data-target="single-file-body">Mostrar</button>
+      </div>
+      <div class="section-body" id="single-file-body" hidden>
+        <p class="lead">Esta página entera vive en un solo .html. Vela.</p>
+        <p>Esta página entera — los cinco demos, los toggles, el árbol del DOM, el theming — vive en <strong>un solo archivo HTML</strong>. Sin <code>node_modules</code>, sin pipeline, sin servidor. Sólo tres tecnologías inline: HTML, CSS, JS.</p>
+        <div class="demo-area">
+          <p>¿No me creés? Vela:</p>
+          <button id="btn-view-source">Ver el código fuente</button>
+          <p class="estado-state" style="margin-top: var(--space-sm)">
+            También podés copiar este archivo, pegarlo en un Gist y servirlo como GitHub Pages.
+          </p>
+        </div>
+
+        <div class="modal" id="source-modal" hidden>
+          <div class="modal-backdrop"></div>
+          <div class="modal-panel">
+            <div class="modal-header">
+              <h3>demo.html — código fuente</h3>
+              <button id="btn-close-modal" class="secondary">Cerrar</button>
+            </div>
+            <pre id="source-content"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Material de clase — Semana 2 · Introducción a la ingeniería de software asistida por IA
+  </footer>
+
+  <script>
+    // === Section show/hide toggles ===
+    // Each demo-section starts hidden; the "Mostrar / Ocultar" button in
+    // its header toggles visibility of the section-body sibling.
+    document.querySelectorAll('.toggle-section').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = document.getElementById(btn.dataset.target);
+        if (!target) return;
+        if (target.hasAttribute('hidden')) {
+          target.removeAttribute('hidden');
+          btn.textContent = 'Ocultar';
+        } else {
+          target.setAttribute('hidden', '');
+          btn.textContent = 'Mostrar';
+        }
+      });
+    });
+
+    // === App state ===
+    // (populated by section initializers)
+
+    // === Section initializers ===
+    // === §1 Estructura ===
+    const estructuraVersions = {
+      semantic: `<article>
+  <header>
+    <h3>Recetas de la abuela</h3>
+    <nav>
+      <a href="#">Inicio</a>
+      <a href="#">Recetas</a>
+      <a href="#">Sobre mí</a>
+    </nav>
+  </header>
+  <section>
+    <p>Bienvenidos al recetario familiar. Hoy: tarta de manzana.</p>
+  </section>
+  <footer>Última actualización: marzo 2026</footer>
+</article>`,
+      divsoup: `<div class="article-fake">
+  <div class="header-fake">
+    <div class="title-fake">Recetas de la abuela</div>
+    <div class="nav-fake">
+      <span><a href="#">Inicio</a></span>
+      <span><a href="#">Recetas</a></span>
+      <span><a href="#">Sobre mí</a></span>
+    </div>
+  </div>
+  <div class="section-fake">
+    <div>Bienvenidos al recetario familiar. Hoy: tarta de manzana.</div>
+  </div>
+  <div class="footer-fake">Última actualización: marzo 2026</div>
+</div>`,
+    };
+
+    function initEstructura() {
+      const render = document.getElementById('estructura-render');
+      const source = document.getElementById('estructura-source');
+      const btnSem = document.getElementById('btn-semantic');
+      const btnDiv = document.getElementById('btn-divsoup');
+      const btnSrc = document.getElementById('btn-show-source');
+      let current = 'semantic';
+      let sourceVisible = false;
+
+      function paint() {
+        render.innerHTML = estructuraVersions[current];
+        source.textContent = estructuraVersions[current];
+        btnSem.classList.toggle('active', current === 'semantic');
+        btnSem.classList.toggle('secondary', current !== 'semantic');
+        btnDiv.classList.toggle('active', current === 'divsoup');
+        btnDiv.classList.toggle('secondary', current !== 'divsoup');
+        source.hidden = !sourceVisible;
+        btnSrc.textContent = sourceVisible ? 'Ocultar código' : 'Ver código';
+      }
+
+      btnSem.addEventListener('click', () => { current = 'semantic'; paint(); });
+      btnDiv.addEventListener('click', () => { current = 'divsoup'; paint(); });
+      btnSrc.addEventListener('click', () => { sourceVisible = !sourceVisible; paint(); });
+
+      paint();
+    }
+    initEstructura();
+    // === §2 Estilo ===
+    function initEstilo() {
+      initBoxModel();
+      initFlex();
+      initGrid();
+      initTipografia();
+      initVariables();
+      initCombo();
+    }
+
+    function setActiveAmong(group, btn) {
+      group.forEach(b => {
+        b.classList.toggle('active', b === btn);
+        b.classList.toggle('secondary', b !== btn);
+      });
+    }
+
+    function initBoxModel() {
+      const buttons = document.querySelectorAll('.bm-button');
+      const current = document.getElementById('bm-current');
+      const state = {
+        padding: '10px 20px',
+        'border-width': '3px',
+        margin: '8px 0',
+        'border-radius': '6px',
+      };
+      function paint() {
+        buttons.forEach(b => {
+          b.style.padding = state.padding;
+          b.style.borderWidth = state['border-width'];
+          b.style.margin = state.margin;
+          b.style.borderRadius = state['border-radius'];
+        });
+        current.textContent = `padding: ${state.padding}; border: ${state['border-width']} solid; margin: ${state.margin}; border-radius: ${state['border-radius']};`;
+      }
+      const props = ['padding', 'border-width', 'margin', 'border-radius'];
+      props.forEach(prop => {
+        const group = document.querySelectorAll(`button[data-bm="${prop}"]`);
+        group.forEach(btn => {
+          btn.addEventListener('click', () => {
+            state[prop] = btn.dataset.value;
+            setActiveAmong(group, btn);
+            paint();
+          });
+        });
+      });
+      paint();
+    }
+
+    function initFlex() {
+      const playground = document.getElementById('flex-playground');
+      const current = document.getElementById('flex-current');
+      const jcButtons = document.querySelectorAll('.jc-btn');
+      jcButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const jc = btn.dataset.jc;
+          playground.style.justifyContent = jc;
+          current.textContent = `justify-content: ${jc}`;
+          setActiveAmong(jcButtons, btn);
+        });
+      });
+    }
+
+    function initGrid() {
+      const playground = document.getElementById('grid-playground');
+      const current = document.getElementById('grid-current');
+      const gtcButtons = document.querySelectorAll('.gtc-btn');
+      gtcButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const gtc = btn.dataset.gtc;
+          playground.style.gridTemplateColumns = gtc;
+          current.textContent = `grid-template-columns: ${gtc}`;
+          setActiveAmong(gtcButtons, btn);
+        });
+      });
+    }
+
+    function initTipografia() {
+      const heading = document.getElementById('typo-heading');
+      const body = document.getElementById('typo-body');
+      const current = document.getElementById('typo-current');
+      const schemes = {
+        sans: {
+          heading: 'system-ui, -apple-system, sans-serif',
+          body:    'system-ui, -apple-system, sans-serif',
+          label: 'heading: sans-serif · body: sans-serif',
+        },
+        pair: {
+          heading: 'Georgia, "Times New Roman", serif',
+          body:    'system-ui, -apple-system, sans-serif',
+          label: 'heading: serif · body: sans-serif',
+        },
+        mono: {
+          heading: '"SF Mono", Monaco, "Cascadia Code", monospace',
+          body:    '"SF Mono", Monaco, "Cascadia Code", monospace',
+          label: 'heading: monospace · body: monospace',
+        },
+      };
+      const buttons = document.querySelectorAll('.typo-btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const scheme = schemes[btn.dataset.typo];
+          heading.style.fontFamily = scheme.heading;
+          body.style.fontFamily    = scheme.body;
+          current.textContent = scheme.label;
+          setActiveAmong(buttons, btn);
+        });
+      });
+    }
+
+    function initVariables() {
+      const themeCurrent = document.getElementById('theme-current');
+      const themeButtons = document.querySelectorAll('.theme-btn');
+      themeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const accent = btn.dataset.accent;
+          document.documentElement.style.setProperty('--color-accent', accent);
+          themeCurrent.textContent = `--color-accent: ${accent}`;
+          setActiveAmong(themeButtons, btn);
+        });
+      });
+    }
+
+    function initCombo() {
+      const stage = document.getElementById('combo-stage');
+      const current = document.getElementById('combo-current');
+      const buttons = document.querySelectorAll('.combo-btn');
+      // Each preset is a complete swap of the 4 primitivas.
+      const presets = {
+        tech: {
+          'combo-bg': '#0f172a',
+          'combo-text': '#e2e8f0',
+          'combo-accent': '#6366f1',
+          'combo-muted': '#94a3b8',
+          'combo-cards-cols': '1fr 1fr 1fr',
+          'combo-card-padding': '14px',
+          'combo-card-border-width': '1px',
+          'combo-card-border-color': '#334155',
+          'combo-card-radius': '6px',
+          'combo-heading-font': 'system-ui, -apple-system, sans-serif',
+          'combo-body-font': 'system-ui, -apple-system, sans-serif',
+          label: 'tipografía: sans · grid: 3 col · accent: #6366f1 · padding: 14px · border: 1px · radius: 6px',
+        },
+        editorial: {
+          'combo-bg': '#fef9f0',
+          'combo-text': '#1f2937',
+          'combo-accent': '#b45309',
+          'combo-muted': '#6b7280',
+          'combo-cards-cols': '1fr',
+          'combo-card-padding': '28px',
+          'combo-card-border-width': '0px',
+          'combo-card-border-color': '#e5e7eb',
+          'combo-card-radius': '0px',
+          'combo-heading-font': 'Georgia, "Times New Roman", serif',
+          'combo-body-font': 'system-ui, -apple-system, sans-serif',
+          label: 'tipografía: serif heading + sans body · grid: 1 col · accent: #b45309 · padding: 28px · border: 0 · radius: 0',
+        },
+        pop: {
+          'combo-bg': '#581c87',
+          'combo-text': '#fef3c7',
+          'combo-accent': '#fde047',
+          'combo-muted': '#e9d5ff',
+          'combo-cards-cols': '1fr 1fr',
+          'combo-card-padding': '22px',
+          'combo-card-border-width': '4px',
+          'combo-card-border-color': '#fde047',
+          'combo-card-radius': '24px',
+          'combo-heading-font': 'system-ui, -apple-system, sans-serif',
+          'combo-body-font': 'system-ui, -apple-system, sans-serif',
+          label: 'tipografía: sans · grid: 2 col · accent: #fde047 · padding: 22px · border: 4px · radius: 24px',
+        },
+        brutal: {
+          'combo-bg': '#ffffff',
+          'combo-text': '#000000',
+          'combo-accent': '#ec4899',
+          'combo-muted': '#374151',
+          'combo-cards-cols': '1fr 1fr 1fr',
+          'combo-card-padding': '12px',
+          'combo-card-border-width': '3px',
+          'combo-card-border-color': '#000000',
+          'combo-card-radius': '0px',
+          'combo-heading-font': '"SF Mono", Monaco, "Cascadia Code", monospace',
+          'combo-body-font': '"SF Mono", Monaco, "Cascadia Code", monospace',
+          label: 'tipografía: monospace · grid: 3 col · accent: #ec4899 · padding: 12px · border: 3px · radius: 0',
+        },
+      };
+      function applyPreset(name) {
+        const p = presets[name];
+        Object.entries(p).forEach(([key, value]) => {
+          if (key === 'label') return;
+          stage.style.setProperty(`--${key}`, value);
+        });
+        current.textContent = p.label;
+      }
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          applyPreset(btn.dataset.preset);
+          setActiveAmong(buttons, btn);
+        });
+      });
+      applyPreset('tech');
+    }
+
+    initEstilo();
+    // === §3 Estado ===
+    function initEstado() {
+      // Counter
+      let count = 0;
+      const counterDisplay = document.getElementById('counter-display');
+      const counterState = document.getElementById('counter-state');
+      function paintCounter() {
+        counterDisplay.textContent = count;
+        counterState.textContent = `count = ${count}`;
+      }
+      document.getElementById('counter-inc').addEventListener('click', () => { count++; paintCounter(); });
+      document.getElementById('counter-dec').addEventListener('click', () => { count--; paintCounter(); });
+      document.getElementById('counter-reset').addEventListener('click', () => { count = 0; paintCounter(); });
+      paintCounter();
+
+      // Todo list
+      let items = [];
+      const todoList = document.getElementById('todo-list');
+      const todoState = document.getElementById('todo-state');
+      const todoForm = document.getElementById('todo-form');
+      const todoInput = document.getElementById('todo-input');
+      function paintTodos() {
+        todoList.innerHTML = '';
+        items.forEach((item, idx) => {
+          const li = document.createElement('li');
+          const span = document.createElement('span');
+          span.textContent = item;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.textContent = '×';
+          btn.addEventListener('click', () => {
+            items.splice(idx, 1);
+            paintTodos();
+          });
+          li.appendChild(span);
+          li.appendChild(btn);
+          todoList.appendChild(li);
+        });
+        todoState.textContent = `items = [${items.map(i => `'${i.slice(0, 8)}${i.length > 8 ? '…' : ''}'`).join(', ')}]`;
+      }
+      todoForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const value = todoInput.value.trim();
+        if (!value) return;
+        items.push(value);
+        todoInput.value = '';
+        paintTodos();
+      });
+      paintTodos();
+
+      // Event log
+      const target = document.getElementById('event-target');
+      const log = document.getElementById('event-log');
+      let eventCount = 0;
+      target.addEventListener('click', (e) => {
+        eventCount++;
+        const li = document.createElement('li');
+        const time = new Date().toLocaleTimeString();
+        li.textContent = `[${time}] click #${eventCount} en (${e.offsetX}, ${e.offsetY})`;
+        log.insertBefore(li, log.firstChild);
+        while (log.children.length > 8) log.removeChild(log.lastChild);
+      });
+    }
+    initEstado();
+    // === §4 DOM ===
+    function initDOM() {
+      const tree = document.getElementById('dom-tree');
+      const root = document.getElementById('estado');
+      let highlightedEl = null;
+
+      function clearHighlight() {
+        if (highlightedEl) {
+          highlightedEl.classList.remove('dom-highlight');
+          highlightedEl = null;
+        }
+      }
+
+      function renderNode(el) {
+        const li = document.createElement('li');
+        const label = document.createElement('span');
+        label.className = 'dom-label';
+        const tag = `<span class="tag">${el.tagName.toLowerCase()}</span>`;
+        const id = el.id ? `<span class="id">#${el.id}</span>` : '';
+        const cls = el.className && typeof el.className === 'string'
+          ? `<span class="cls">.${el.className.split(' ').filter(Boolean).join('.')}</span>`
+          : '';
+        label.innerHTML = `&lt;${tag}${id}${cls}&gt;`;
+        li.appendChild(label);
+
+        label.addEventListener('mouseenter', () => {
+          clearHighlight();
+          el.classList.add('dom-highlight');
+          highlightedEl = el;
+        });
+        label.addEventListener('mouseleave', clearHighlight);
+
+        if (el.children.length > 0) {
+          const ul = document.createElement('ul');
+          for (const child of el.children) {
+            ul.appendChild(renderNode(child));
+          }
+          li.appendChild(ul);
+        }
+        return li;
+      }
+
+      function rebuild() {
+        clearHighlight();
+        tree.innerHTML = '';
+        tree.appendChild(renderNode(root));
+      }
+
+      rebuild();
+
+      const observer = new MutationObserver(() => rebuild());
+      observer.observe(root, { childList: true, subtree: true });
+    }
+    initDOM();
+    // === §5 Single-file ===
+    function initSingleFile() {
+      const btn = document.getElementById('btn-view-source');
+      const modal = document.getElementById('source-modal');
+      const close = document.getElementById('btn-close-modal');
+      const content = document.getElementById('source-content');
+      const backdrop = modal.querySelector('.modal-backdrop');
+
+      btn.addEventListener('click', async () => {
+        try {
+          const response = await fetch(window.location.href);
+          const text = await response.text();
+          content.textContent = text;
+        } catch (err) {
+          content.textContent = '// No se pudo leer el archivo desde el navegador (security policy de file://). Para ver el código, abrí demo.html con cualquier editor de texto, o usá Ctrl+U / Cmd+Option+U en el navegador.';
+        }
+        modal.hidden = false;
+      });
+
+      function closeModal() { modal.hidden = true; }
+      close.addEventListener('click', closeModal);
+      backdrop.addEventListener('click', closeModal);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.hidden) closeModal();
+      });
+    }
+    initSingleFile();
+  </script>
+</body>
+</html>

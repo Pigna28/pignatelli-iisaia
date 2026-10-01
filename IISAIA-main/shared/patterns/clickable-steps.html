@@ -1,0 +1,26 @@
+<!--
+  Pattern: Clickable steps with detail-on-click
+  When to use: A multi-step explainer where students can click each step to see a concrete example
+    panel below. The week 01 implementation uses clickable-steps.js as the renderer.
+  Canonical example: semanas/01/slides/index.html:1895 ("Mitigación: enseñar a decir 'no sé'")
+  Reusable JS: semanas/01/slides/clickable-steps.js (copy and adapt as needed).
+-->
+<section>
+  <h2>Proceso paso a paso</h2>
+  <div id="my-clickable-steps"></div>
+  <aside class="notes">
+    <p><strong>Click en cada paso para ver el ejemplo concreto.</strong></p>
+    <p><u>Walkthrough multi-paso interactivo.</u></p>
+    <p><em>"El proceso tiene varios pasos. Vamos a mirar uno por uno. El paso 1 es [...]. Hacé clic acá y vas a ver un ejemplo concreto."</em></p>
+  </aside>
+</section>
+<script src="clickable-steps.js"></script>
+<script>
+  initClickableSteps({
+    containerId: 'my-clickable-steps',
+    steps: [
+      { label: 'Paso 1', detail: '<p>Detalle del paso 1.</p>' },
+      { label: 'Paso 2', detail: '<p>Detalle del paso 2.</p>' }
+    ]
+  });
+</script>

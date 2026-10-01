@@ -1,0 +1,34 @@
+<!--
+  Pattern: Data table
+  When to use: Numerical comparisons (model sizes, costs, memory, parameters) where you want
+    students to see scale differences. Use color on values to highlight scale.
+  Canonical example: semanas/01/slides/index.html:1261 ("Mismo stack, otra escala")
+-->
+<section>
+  <h2>Comparación numérica</h2>
+  <table style="width: 100%; border-collapse: collapse; font-size: 0.85em;">
+    <thead>
+      <tr>
+        <th style="text-align: left; padding: 8px; border-bottom: 2px solid var(--text-muted);">Modelo</th>
+        <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--text-muted);">Parámetros</th>
+        <th style="text-align: right; padding: 8px; border-bottom: 2px solid var(--text-muted);">Costo</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="padding: 8px;">Modelo A</td>
+        <td style="text-align: right; padding: 8px; color: var(--accent);">7B</td>
+        <td style="text-align: right; padding: 8px;">$X</td>
+      </tr>
+      <tr>
+        <td style="padding: 8px;">Modelo B</td>
+        <td style="text-align: right; padding: 8px; color: var(--accent-secondary);">405B</td>
+        <td style="text-align: right; padding: 8px;">$Y</td>
+      </tr>
+    </tbody>
+  </table>
+  <aside class="notes">
+    <p><u>Tabla comparativa numérica.</u></p>
+    <p><em>"Mirá los números. [Modelo A] tiene [N] parámetros. [Modelo B] tiene [M] — un orden de magnitud más grande. Esa diferencia se traduce en [consecuencia concreta]."</em></p>
+  </aside>
+</section>

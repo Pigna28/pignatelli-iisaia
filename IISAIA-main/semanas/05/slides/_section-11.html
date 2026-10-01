@@ -1,0 +1,404 @@
+<style>
+  /* §11 — requesting-code-review */
+
+  /* §11.2 — Qué hace: diagrama del reviewer separado */
+  .s11-arch {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    max-width: 1050px;
+    margin: var(--spacing-md) auto 0 auto;
+  }
+  .s11-actor {
+    background: var(--bg-secondary);
+    border-top: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+  }
+  .s11-actor.is-reviewer {
+    border-top-color: var(--accent-secondary);
+  }
+  .s11-actor-tag {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 4px 0;
+  }
+  .s11-actor.is-reviewer .s11-actor-tag {
+    color: var(--accent-secondary);
+  }
+  .s11-actor-name {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+  .s11-actor-body {
+    color: var(--text-primary);
+    font-size: 0.98rem;
+    line-height: 1.45;
+    margin: 0;
+  }
+  .s11-actor-sees {
+    margin: var(--spacing-xs) 0 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s11-actor-sees li {
+    padding-left: var(--spacing-md);
+    position: relative;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .s11-actor-sees li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .s11-actor.is-reviewer .s11-actor-sees li::before {
+    color: var(--accent-secondary);
+  }
+  .s11-actor-not {
+    margin: var(--spacing-xs) 0 0 0;
+    padding-left: var(--spacing-md);
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-style: italic;
+  }
+  .s11-actor-not::before {
+    content: "✗ ";
+    color: var(--text-muted);
+    font-weight: 700;
+    font-style: normal;
+  }
+  .s11-arrow {
+    align-self: center;
+    color: var(--text-muted);
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
+  .s11-arch-note {
+    display: block;
+    text-align: center !important;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 1050px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: var(--spacing-md);
+    margin-bottom: 0;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* §11.4 — Severidades */
+  .s11-sev {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+    max-width: 1150px;
+    margin: var(--spacing-md) auto 0 auto;
+  }
+  .s11-sev-card {
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-top: 4px solid var(--text-muted);
+  }
+  .s11-sev-card.is-critical { border-top-color: #ff5a5a; }
+  .s11-sev-card.is-major { border-top-color: var(--accent); }
+  .s11-sev-card.is-minor { border-top-color: var(--accent-secondary); }
+  .s11-sev-name {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+  .s11-sev-card.is-critical .s11-sev-name { color: #ff5a5a; }
+  .s11-sev-card.is-major .s11-sev-name { color: var(--accent); }
+  .s11-sev-card.is-minor .s11-sev-name { color: var(--accent-secondary); }
+  .s11-sev-action {
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.45;
+    margin: 0 0 var(--spacing-xs) 0;
+  }
+  .s11-sev-action strong {
+    color: var(--text-primary);
+  }
+  .s11-sev-when {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.4;
+    margin: 0;
+    font-style: italic;
+  }
+
+  /* §11.5 — Caso real */
+  .s11-case {
+    max-width: 1050px;
+    margin: var(--spacing-md) auto 0 auto;
+  }
+  .s11-case-header {
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--accent-secondary);
+    border-radius: 6px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .s11-case-header strong {
+    color: var(--accent-secondary);
+  }
+  .s11-case-verdict {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(100, 255, 218, 0.1);
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-right: var(--spacing-xs);
+  }
+  .s11-issue {
+    background: var(--bg-secondary);
+    border-radius: 6px;
+    padding: var(--spacing-xs) var(--spacing-md);
+    margin-bottom: 4px;
+    border-left: 3px solid #ff5a5a;
+  }
+  .s11-issue-head {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.98rem;
+    margin: 0;
+  }
+  .s11-issue-head code {
+    background: var(--bg-primary);
+    border-radius: 3px;
+    padding: 1px 6px;
+    color: var(--accent-secondary);
+  }
+  .s11-issue-rule {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 2px 0 0 0;
+    font-style: italic;
+  }
+  .s11-case-resolution {
+    display: block;
+    text-align: center !important;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    max-width: 1050px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: var(--spacing-md);
+    margin-bottom: 0;
+    line-height: 1.5;
+  }
+  .s11-case-resolution strong {
+    color: var(--accent);
+    font-family: var(--font-mono);
+  }
+  .s11-sev-rules {
+    max-width: 1000px;
+    margin: var(--spacing-md) auto 0 auto;
+    text-align: center;
+  }
+  .reveal .s11-sev-rules p {
+    margin: 4px 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+  }
+  .s11-declined {
+    margin-top: var(--spacing-xs);
+    padding-top: var(--spacing-xs);
+    border-top: 1px dashed var(--text-muted);
+  }
+  .s11-issue.is-minor {
+    border-left-color: var(--text-muted);
+  }
+</style>
+
+<!-- §11.1 — Opener: mini-roadmap iluminado en s11 -->
+<section>
+  <div class="pipe-grid s5-happy-path is-mini highlight-s11">
+    <div class="pipe-node" data-group="s6"><div class="pipe-icon">1</div><div class="pipe-label">brainstorming</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M2 7h16m0 0l-5-5m5 5l-5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s7"><div class="pipe-icon">2</div><div class="pipe-label">writing-plans</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M2 7h16m0 0l-5-5m5 5l-5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s8"><div class="pipe-icon">git</div><div class="pipe-label">GitHub Flow</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M2 7h16m0 0l-5-5m5 5l-5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s9"><div class="pipe-icon">3</div><div class="pipe-label">subagent-driven-development</div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div>
+    <div class="pipe-arrow" style="transform: rotate(90deg);"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M2 7h16m0 0l-5-5m5 5l-5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s13"><div class="pipe-icon">7</div><div class="pipe-label">finishing-a-development-branch</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M22 7H6m0 0l5-5M6 7l5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s12"><div class="pipe-icon">6</div><div class="pipe-label">verification-before-completion</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M22 7H6m0 0l5-5M6 7l5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s11"><div class="pipe-icon">5</div><div class="pipe-label">requesting-code-review</div></div>
+    <div class="pipe-arrow"><svg width="20" height="12" viewBox="0 0 24 14"><path d="M22 7H6m0 0l5-5M6 7l5 5" stroke="var(--accent)" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="pipe-node" data-group="s10"><div class="pipe-icon">4</div><div class="pipe-label">test-driven-development</div></div>
+  </div>
+
+  <div class="s-skill-opener">
+    <h2 class="s-skill-opener-name">requesting-code-review</h2>
+    <p class="s-skill-opener-tag">Una pasada con ojos frescos antes de claimar listo.</p>
+  </div>
+
+  <aside class="notes">
+    <p><u>Opener de §11. Quinta skill del happy-path; pieza s11 iluminada en el roadmap.</u></p>
+    <p><em>"Quinta skill: requesting-code-review. Un review estructurado contra el plan, con un agente distinto del que implementó. Ya la vieron trabajar sin nombrarla: es la review final de toda la rama con la que cierran los dos modos de ejecución. Acá la miramos por dentro."</em></p>
+  </aside>
+</section>
+
+<!-- §11.2 — Qué hace: implementer vs reviewer -->
+<section>
+  <h2 style="text-align: center; max-width: 900px; margin: 0 auto;">Implementer y reviewer son agentes distintos</h2>
+
+  <div class="s11-arch">
+    <div class="s11-actor">
+      <p class="s11-actor-tag">Implementer</p>
+      <p class="s11-actor-name">El que escribió el código</p>
+      <ul class="s11-actor-sees">
+        <li>plan y spec</li>
+        <li>toda la sesión de implementación</li>
+        <li>las decisiones tácitas que tomó</li>
+      </ul>
+    </div>
+    <div class="s11-arrow">→</div>
+    <div class="s11-actor is-reviewer">
+      <p class="s11-actor-tag">Reviewer</p>
+      <p class="s11-actor-name">Agente fresco, dispatchado aparte</p>
+      <ul class="s11-actor-sees">
+        <li>el diff</li>
+        <li>el spec original</li>
+      </ul>
+      <p class="s11-actor-not">no ve el historial de sesión</p>
+    </div>
+  </div>
+
+  <p class="s11-arch-note">Sin el historial, el reviewer no carga el sesgo del autor ni la narrativa de &laquo;ya lo discutimos y quedó así&raquo;.</p>
+
+  <aside class="notes">
+    <p><u>El concepto central de la skill: el reviewer es un agente separado y limitado, no la continuación del implementer.</u></p>
+    <p><em>"El concepto central es éste: el implementer y el reviewer son agentes distintos. El implementer es el que escribió el código — vio el plan, el spec, toda la sesión, las decisiones intermedias. El reviewer es un agente fresco, dispatchado aparte, que sólo ve el diff que se generó y el spec original. No ve el historial de sesión."</em></p>
+    <p><em>"Eso es a propósito. Sin el historial, el reviewer no carga el sesgo de quien implementó ni la narrativa de 'ya lo discutimos y quedó así'. Llega como un par de ojos limpios al código terminado."</em></p>
+  </aside>
+</section>
+
+<!-- §11.3 — Cuándo + Por qué (combinado con reveals) -->
+<section>
+  <h2 style="text-align: center; max-width: 900px; margin: 0 auto;">Cuándo se activa y por qué importa</h2>
+
+  <div class="fragment fade-in" data-fragment-index="0">
+    <p class="s6-sublabel" style="margin-top: var(--spacing-md);">Cuándo se activa</p>
+    <div class="s6-compare">
+      <div class="s6-compare-card is-yes">
+        <div class="s6-compare-tag">Al final, antes de cerrar</div>
+        <p class="s6-compare-body">Viene incluida al final de los dos modos de ejecución. Sola, antes de mergear cambios que tocan más de un par de archivos.</p>
+      </div>
+      <div class="s6-compare-card is-no">
+        <div class="s6-compare-tag">Útil también si estás trabado</div>
+        <p class="s6-compare-body">Un agente fresco lee el trabajo y marca lo que vos ya naturalizaste y no ves.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="fragment fade-in" data-fragment-index="1">
+    <p class="s6-sublabel">Por qué importa</p>
+    <div class="s6-central" style="margin-top: 0;">
+      <div class="s6-central-main">
+        Code review encuentra cosas <strong>distintas</strong> a las que encuentran los tests: dead code, desfasaje entre spec y código, ergonomía pésima de API pública, archivos que crecieron demasiado, convenciones del proyecto rotas sin que los tests fallen.
+      </div>
+      <p class="s6-central-sub">
+        Tests verifican comportamiento. Review verifica diseño.
+      </p>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Dos reveals — cuándo + por qué.</strong></p>
+    <p><u>Cuándo se invoca la skill + qué encuentra esta pasada que no encuentran los tests.</u></p>
+    <p><em>"Cuándo se activa: cuando terminás de implementar el plan, después de que TDD pasó verde, antes de pasar a finishing-branch. Si ejecutaste con subagent-driven o en Native, ya corre sola al final: es la review de toda la rama. También la podés pedir aparte antes de mergear features grandes o cualquier cambio que toque más de un par de archivos. Y un caso menos obvio: si estás trabado y no sabés qué falta, también sirve — un agente fresco lee el trabajo y te marca lo que vos ya no ves."</em></p>
+    <p><em>"Por qué importa: code review encuentra cosas distintas a las que encuentran los tests. Dead code que quedó de una iteración anterior. Desfasaje entre lo que dice el spec y lo que hace el código. Ergonomía pésima de la API pública. Archivos que crecieron demasiado. Convenciones no escritas del proyecto — por ejemplo cómo se manejan los errores o cómo se nombran los endpoints — que el código viola sin que los tests se enteren. Los tests verifican comportamiento; el review verifica diseño. Son dos cosas distintas y se complementan."</em></p>
+  </aside>
+</section>
+
+<!-- §11.4 — Las tres severidades -->
+<section>
+  <h2 style="text-align: center; max-width: 900px; margin: 0 auto;">Tres severidades</h2>
+
+  <div class="s11-sev">
+    <div class="s11-sev-card is-critical">
+      <p class="s11-sev-name">Crítico</p>
+      <p class="s11-sev-action"><strong>Se resuelve YA.</strong> Bloquea el avance.</p>
+      <p class="s11-sev-when">No se &laquo;anota para después&raquo;.</p>
+    </div>
+    <div class="s11-sev-card is-major">
+      <p class="s11-sev-name">Importante</p>
+      <p class="s11-sev-action"><strong>Se arregla antes de seguir.</strong></p>
+      <p class="s11-sev-when">No degradarlo a menor para no atrasar.</p>
+    </div>
+    <div class="s11-sev-card is-minor">
+      <p class="s11-sev-name">Menor</p>
+      <p class="s11-sev-action"><strong>Se anota.</strong> La review final decide qué queda para después.</p>
+      <p class="s11-sev-when">No requiere acción inmediata.</p>
+    </div>
+  </div>
+
+  <div class="s11-sev-rules fragment fade-in" data-fragment-index="0">
+    <p>Lo que el spec no dice se juzga por <strong>lo que esperaría un usuario razonable</strong>.</p>
+    <p>Lo que el reviewer decide no evaluar va a una lista aparte — <em>Declined to judge</em> — y lo decidís vos.</p>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Un reveal — las dos reglas de abajo.</strong></p>
+    <p><u>Las tres severidades + qué hacer con cada una. La severidad la propone el reviewer. Una justificación del implementer no baja la severidad de un hallazgo, y quien coordina no puede decirle al reviewer qué ignorar.</u></p>
+    <p><em>"El reviewer devuelve un report con dos partes: strengths — qué quedó bien — e issues clasificados por severidad. Los issues vienen en tres niveles. Críticos: se resuelven YA. Bloquean el avance. No se 'anotan para después' — se arreglan en el momento. Si el spec cambió durante la implementación, se modifica el plan; si el spec se mantiene, se ajusta el código. Importantes: se arreglan antes de seguir. No los degradás a menores 'para no atrasar' — si el reviewer marcó algo como importante, hay una razón; pedile que la explique antes de bajarlo de nivel. Menores: se anotan. No requieren acción inmediata; la review final mira la lista y decide qué queda para después."</em></p>
+    <p><em>"Dos reglas más, de las versiones recientes. Primera: el spec nunca nombra todos los casos. Lo que no dice, el reviewer lo juzga por lo que esperaría un usuario razonable — un crash con una entrada que nadie nombró no pasa como menor porque 'el spec no lo pedía'. Segunda: lo que el reviewer decide no evaluar no desaparece: va a una lista que se llama Declined to judge, y cada línea de esa lista la decidís vos."</em></p>
+  </aside>
+</section>
+
+<!-- §11.5 — Caso real: la review final del login con Auth0 -->
+<section>
+  <h2 style="text-align: center; max-width: 1000px; margin: 0 auto;">La review final del login</h2>
+
+  <div class="s11-case">
+    <div class="s11-case-header">
+      Tres tareas aprobadas, 33 tests en verde. Review de toda la rama con <strong>opus</strong>: ningún Crítico, <strong>un Importante</strong>.
+    </div>
+
+    <div class="s11-issue">
+      <p class="s11-issue-head">Importante — cerrar sesión te puede volver a meter</p>
+      <p class="s11-issue-rule">El logout vuelve a <code>/</code>, que redirige al login, y Google te re-loguea sin preguntar. Un usuario razonable espera terminar deslogueado.</p>
+    </div>
+    <div class="s11-issue is-minor fragment fade-in" data-fragment-index="0">
+      <p class="s11-issue-head">6 Menores — &laquo;ninguno bloquea el merge&raquo;</p>
+      <p class="s11-issue-rule s11-declined"><em>Declined to judge:</em> deploy y HTTPS, mostrar el nombre del usuario, logout por GET.</p>
+    </div>
+  </div>
+
+  <p class="s11-case-resolution fragment fade-in" data-fragment-index="1">La prueba en navegador lo confirmó → página pública <code>/logged-out</code>, con su test.</p>
+
+  <aside class="notes">
+    <p><strong>Dos reveals — menores y declined to judge, y la resolución.</strong></p>
+    <p><u>Caso real: la review final de la sesión del login con Auth0 (sesión en inglés, esto es traducción). Hallazgo en backend/auth.py; confirmado después en el navegador.</u></p>
+    <p><em>"Acá lo vemos en la práctica. Las tres tareas habían pasado su review, los 33 tests estaban en verde. Y la review final, la de toda la rama, en opus, encontró algo. Ningún crítico, pero un importante: el botón de cerrar sesión te podía volver a meter. El logout te mandaba a la raíz; la raíz, sin sesión, te manda al login; el login va directo a Google; y Google, que todavía tiene tu sesión abierta, te aprueba sin preguntar. Resultado: tocás cerrar sesión y volvés al catálogo como si nada. Ningún test lo atrapaba, porque los tests no hablan con Google. El reviewer lo razonó por lo que esperaría un usuario: si toco cerrar sesión, quiero quedar afuera."</em></p>
+    <p><em>"Además marcó seis menores y dijo explícitamente que ninguno bloqueaba el merge. Y la lista de lo que decidió no juzgar: deploy y HTTPS, porque el spec era solo local; mostrar el nombre del usuario, porque el spec lo dejaba afuera; que el logout sea un GET. Cada una de esas la decide uno."</em></p>
+    <p><em>"El reviewer propuso verificarlo en el navegador antes de arreglar. Lo probamos, pasó exactamente eso, y el fix fue una página pública de 'Cerraste sesión' como destino del logout, con su test. Un hallazgo que ningún test habría encontrado."</em></p>
+  </aside>
+</section>

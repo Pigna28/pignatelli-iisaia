@@ -1,0 +1,825 @@
+<style>
+/* Scoped styles for §8 only */
+
+/* Heading override scoped to §8 slides (reveal default h2 ~2em — too tall for dense slides) */
+.reveal .slides .s8-slide { text-align: center; }
+.reveal .slides .s8-slide h2 {
+  font-size: 0.82em;
+  line-height: 1.2;
+  margin: 0 0 6px;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.s8-h2-code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+
+/* --- Five-questions card (full + mini) — calibrated identically to §7 --- */
+.reveal .slides .s8-slide h2.s8-five-q-title {
+  font-size: 1.05em;
+  text-align: center;
+  margin: 0 0 16px;
+  line-height: 1.2;
+}
+.reveal .s8-five-q-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  max-width: 900px;
+}
+.s8-five-q-card {
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-radius: 6px;
+  padding: 9px 10px 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+}
+.s8-five-q-card.is-active {
+  opacity: 1;
+  border-color: var(--accent);
+  border-left: 3px solid var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(100, 255, 218, 0.08);
+}
+.s8-five-q-num {
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.s8-five-q-card.is-active .s8-five-q-num {
+  color: var(--accent);
+}
+.s8-five-q-label {
+  font-size: 0.75em;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  text-align: left;
+}
+.s8-five-q-hint {
+  font-size: 0.53em;
+  color: var(--text-muted);
+  line-height: 1.4;
+  text-align: left;
+}
+/* Mini variant */
+.reveal .s8-five-q-grid.is-mini {
+  grid-template-columns: repeat(4, auto);
+  justify-content: center;
+  gap: 4px;
+  max-width: 100%;
+  margin: 0 auto 8px;
+}
+.s8-five-q-grid.is-mini .s8-five-q-card {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border-left-width: 1px;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+}
+.s8-five-q-grid.is-mini .s8-five-q-card.is-active {
+  border-left: 1px solid var(--accent);
+}
+.s8-five-q-grid.is-mini .s8-five-q-num {
+  font-size: 0.43em;
+}
+.s8-five-q-grid.is-mini .s8-five-q-label {
+  font-size: 0.5em;
+}
+
+/* Qué es — bulletpoint list para §8.2 */
+.reveal .s8-qe-list {
+  list-style: disc;
+  display: inline-block;
+  text-align: left;
+  max-width: 740px;
+  margin: 16px auto 0;
+  padding-left: 36px;
+  font-size: 0.62em;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.s8-qe-list li {
+  padding-left: 6px;
+  margin-bottom: 10px;
+}
+.s8-qe-list li::marker {
+  color: var(--accent);
+}
+.s8-qe-list strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.s8-qe-list code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+}
+.s8-qe-list li.s8-qe-callout {
+  list-style: none;
+  margin-left: -32px;
+  margin-top: 10px;
+  background: rgba(100, 255, 218, 0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 8px 14px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Jerarquía — cascade layout (2 niveles) */
+.s8-hierarchy {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 740px;
+  margin: 12px auto 0;
+}
+.s8-hier-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 0;
+  align-items: stretch;
+}
+.s8-hier-level {
+  background: var(--bg-code);
+  border: 1px solid #2a3a5a;
+  border-right: none;
+  border-bottom: none;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.s8-hier-row:first-child .s8-hier-level { border-radius: 8px 0 0 0; }
+.s8-hier-row:last-child .s8-hier-level {
+  border-radius: 0 0 0 8px;
+  border-bottom: 1px solid #2a3a5a;
+}
+.s8-hier-level-num {
+  font-size: 0.45em;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+.s8-hier-level-name {
+  font-size: 0.55em;
+  font-weight: 700;
+  color: var(--accent-secondary);
+  text-align: center;
+  line-height: 1.3;
+}
+.s8-hier-content {
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-bottom: none;
+  padding: 8px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  justify-content: center;
+  text-align: left;
+}
+.s8-hier-row:first-child .s8-hier-content { border-radius: 0 8px 0 0; }
+.s8-hier-row:last-child .s8-hier-content {
+  border-radius: 0 0 8px 0;
+  border-bottom: 1px solid #2a3a5a;
+}
+.s8-hier-title {
+  font-size: 0.6em;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.s8-hier-paths {
+  font-size: 0.53em;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.s8-hier-paths code {
+  font-family: var(--font-mono);
+}
+.s8-hier-use {
+  font-size: 0.55em;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.reveal .s8-hier-note {
+  max-width: 740px;
+  margin: 12px auto 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 0.55em;
+  color: var(--text-muted);
+  line-height: 1.5;
+  text-align: center;
+}
+.reveal .s8-hier-note + .s8-hier-note {
+  margin-top: 6px !important;
+}
+.s8-hier-note code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+}
+.s8-hier-note strong { color: var(--text-primary); }
+
+/* Comparison 2-col — sin frontmatter vs con paths: */
+.s8-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 900px;
+  margin: 12px auto 0;
+}
+.s8-compare-col {
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+.s8-compare-col.is-always { border-top: 3px solid var(--accent-secondary); }
+.s8-compare-col.is-scoped { border-top: 3px solid var(--accent); }
+.s8-compare-tag {
+  font-family: var(--font-mono);
+  font-size: 0.46em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.reveal .slides .s8-slide .s8-compare-h3 {
+  font-size: 0.75em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.25;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.s8-compare-col.is-always .s8-compare-h3 strong { color: var(--accent-secondary); }
+.s8-compare-col.is-scoped .s8-compare-h3 strong { color: var(--accent); }
+.s8-compare-h3 code { font-family: var(--font-mono); }
+.s8-compare-file {
+  font-family: var(--font-mono);
+  font-size: 0.5em;
+  color: var(--text-muted);
+}
+.reveal pre.s8-compare-code {
+  background: var(--bg-code);
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.53em;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  margin: 0;
+  width: auto;
+  box-shadow: none;
+  font-variant-ligatures: none;
+}
+.s8-compare-code .c { color: var(--text-muted); }
+.s8-compare-code .k { color: var(--accent); }
+.s8-compare-code .y { color: var(--accent-secondary); }
+.reveal .s8-compare-body {
+  font-size: 0.55em;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.reveal .s8-compare-cost {
+  font-size: 0.55em;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  border-top: 1px solid #2a3a5a;
+  padding-top: 7px;
+  margin: 0;
+}
+.s8-compare-col.is-always .s8-compare-cost strong { color: var(--accent-secondary); }
+.s8-compare-col.is-scoped .s8-compare-cost strong { color: var(--accent); }
+
+/* Cómo se usa — code-walkthrough de la rule scoped */
+.s8-howto-wrap {
+  max-width: 920px;
+  margin: 10px auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.s8-howto-path {
+  background: var(--bg-code);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.55em;
+  color: var(--accent);
+  text-align: center;
+}
+.reveal pre.s8-howto-code {
+  background: var(--bg-code);
+  border: 1px solid #2a3a5a;
+  border-radius: 7px;
+  padding: 8px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.53em;
+  line-height: 1.45;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  text-align: left;
+  margin: 0;
+  width: auto;
+  box-shadow: none;
+  font-variant-ligatures: none;
+}
+.s8-howto-code .c { color: var(--text-muted); }
+.s8-howto-code .k { color: var(--accent); font-weight: 700; }
+.s8-howto-code .y { color: var(--accent-secondary); }
+.reveal .slides .s8-slide .s8-howto-h3 {
+  font-size: 0.62em;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 6px;
+  line-height: 1.25;
+  text-transform: none;
+  letter-spacing: 0;
+  text-align: left;
+}
+.s8-globs {
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-radius: 7px;
+  padding: 8px 14px;
+}
+.s8-globs-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  column-gap: 14px;
+  row-gap: 6px;
+  align-items: baseline;
+  text-align: left;
+}
+.s8-glob-pat {
+  font-family: var(--font-mono);
+  font-size: 0.55em;
+  color: var(--accent);
+  font-variant-ligatures: none;
+  white-space: nowrap;
+}
+.s8-glob-text {
+  font-size: 0.55em;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+.s8-glob-text code { font-family: var(--font-mono); }
+
+/* Las rules del repo — lista */
+.reveal .s8-rules-list {
+  max-width: 860px;
+  margin: 14px auto 0;
+  padding-left: 36px;
+  font-size: 0.58em;
+  line-height: 1.65;
+  color: var(--text-muted);
+  list-style: disc;
+  text-align: left;
+}
+.s8-rules-list li {
+  padding-left: 4px;
+  margin-bottom: 10px;
+}
+.s8-rules-list li::marker {
+  color: var(--accent-secondary);
+}
+.s8-rules-list li.is-scoped::marker {
+  color: var(--accent);
+}
+.s8-rules-list strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+.s8-rules-list code {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.95em;
+  font-variant-ligatures: none;
+}
+.s8-rules-list em {
+  color: var(--accent-secondary);
+  font-style: normal;
+  font-weight: 700;
+}
+.s8-rules-list li.is-scoped em {
+  color: var(--accent);
+}
+
+/* Demo */
+.reveal .s8-demo-lead {
+  font-size: 0.72em;
+  color: var(--text-muted);
+  margin-top: 14px;
+  font-style: italic;
+}
+/* padding-bottom reserva lugar para el panel de ejemplo (absolute) dentro del section */
+.reveal .s8-demo-wrap {
+  max-width: 1040px;
+  margin: 16px auto 0;
+}
+.reveal .s8-demo-wrap .cs-step { min-width: 0; }
+.reveal .s8-demo-wrap code { overflow-wrap: anywhere; }
+
+/* Cierre */
+.s8-close-card {
+  max-width: 700px;
+  margin: 18px auto 0;
+  background: var(--bg-secondary);
+  border: 1px solid #2a3a5a;
+  border-top: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px 24px;
+  text-align: center;
+}
+.reveal .s8-close-main {
+  font-size: 0.66em;
+  line-height: 1.6;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+}
+.s8-close-main strong { color: var(--accent); }
+.reveal .s8-close-bridge {
+  font-size: 0.6em;
+  color: var(--text-muted);
+  line-height: 1.6;
+  border-top: 1px solid #2a3a5a;
+  padding-top: 11px;
+  margin: 0;
+}
+.s8-close-bridge em {
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+</style>
+
+<!-- §8.1 · Apertura — Tarjeta de 5 preguntas (full opener) -->
+<section class="s8-slide">
+  <h2 class="s8-five-q-title">Rules</h2>
+
+  <ol class="s8-five-q-grid">
+    <li class="s8-five-q-card is-active">
+      <span class="s8-five-q-num">1</span>
+      <span class="s8-five-q-label">Qué es</span>
+      <span class="s8-five-q-hint">definición en una línea</span>
+    </li>
+    <li class="s8-five-q-card">
+      <span class="s8-five-q-num">2</span>
+      <span class="s8-five-q-label">Dónde vive</span>
+      <span class="s8-five-q-hint">paths / niveles</span>
+    </li>
+    <li class="s8-five-q-card">
+      <span class="s8-five-q-num">3</span>
+      <span class="s8-five-q-label">Cuándo se carga</span>
+      <span class="s8-five-q-hint">momento + trigger</span>
+    </li>
+    <li class="s8-five-q-card">
+      <span class="s8-five-q-num">4</span>
+      <span class="s8-five-q-label">Cómo se usa</span>
+      <span class="s8-five-q-hint">sintaxis + ejemplos</span>
+    </li>
+  </ol>
+
+  <aside class="notes">
+    <p><strong>Misma apertura, ritmo más rápido: la plantilla ya la conocen.</strong></p>
+    <p><u>Marca el corte con la sección anterior; el método no cambia.</u></p>
+    <p><em>"Rules. Misma plantilla, sección nueva. Vive en una carpeta que se llama .claude/rules/ y resuelve el problema que dejamos planteado al cerrar CLAUDE.md: cómo tener instrucciones que solo cuesten contexto cuando son relevantes."</em></p>
+  </aside>
+</section>
+
+<!-- §8.2 · Qué es — definición + propiedad central -->
+<section class="s8-slide">
+  <ol class="s8-five-q-grid is-mini">
+    <li class="s8-five-q-card is-active"><span class="s8-five-q-num">1</span><span class="s8-five-q-label">Qué es</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">2</span><span class="s8-five-q-label">Dónde vive</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">3</span><span class="s8-five-q-label">Cuándo se carga</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">4</span><span class="s8-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Un archivo <code class="s8-h2-code">.md</code> por tema, organizable y opcionalmente condicional</h2>
+
+  <ul class="s8-qe-list">
+    <li><strong>Archivo Markdown corto en <code>.claude/rules/</code></strong> sobre un tema acotado: estilo de código, testing, seguridad, convenciones de API.</li>
+    <li><strong>Sin frontmatter:</strong> se carga al arrancar, como un pedazo más de CLAUDE.md. Ocupa contexto siempre.</li>
+    <li><strong>Con frontmatter <code>paths:</code>:</strong> path-scoped. Entra al contexto solo cuando Claude lee un archivo que matchea alguno de los globs.</li>
+    <li class="s8-qe-callout">→ La diferencia con CLAUDE.md es la modularidad por archivo y el scope opcional por path, no la sintaxis.</li>
+  </ul>
+
+  <aside class="notes">
+    <p><strong>Leer los tres bullets y marcar "path-scoped": es el término que vuelve toda la sección.</strong></p>
+    <p><u>Definición: un archivo por tema; sin frontmatter se comporta como CLAUDE.md, con paths: es condicional.</u></p>
+    <p><em>"Primera pregunta: qué es una rule. Un archivo Markdown corto, en .claude/rules/, con instrucciones sobre un tema acotado; un archivo por tema. Sin nada más, se comporta como si hubieras agregado ese texto a CLAUDE.md: entra al arrancar y se queda. La ventaja sobre el monolito es organizativa. Lo interesante aparece cuando le agregás un frontmatter YAML con una clave paths: la rule pasa a ser path-scoped y solo entra cuando Claude lee un archivo que matchea alguno de los globs que declaraste. Si la sesión no toca esos archivos, la rule no paga contexto. Eso responde la pregunta con la que cerramos CLAUDE.md."</em></p>
+  </aside>
+</section>
+
+<!-- §8.3 · Dónde viven — 2 niveles + recursión -->
+<section class="s8-slide">
+  <ol class="s8-five-q-grid is-mini">
+    <li class="s8-five-q-card"><span class="s8-five-q-num">1</span><span class="s8-five-q-label">Qué es</span></li>
+    <li class="s8-five-q-card is-active"><span class="s8-five-q-num">2</span><span class="s8-five-q-label">Dónde vive</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">3</span><span class="s8-five-q-label">Cuándo se carga</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">4</span><span class="s8-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Dos ubicaciones, descubrimiento recursivo</h2>
+
+  <div class="s8-hierarchy">
+    <div class="s8-hier-row">
+      <div class="s8-hier-level">
+        <span class="s8-hier-level-num">Nivel 1</span>
+        <span class="s8-hier-level-name">Usuario</span>
+      </div>
+      <div class="s8-hier-content">
+        <span class="s8-hier-title">Reglas personales para todos tus proyectos</span>
+        <span class="s8-hier-paths"><code>~/.claude/rules/</code></span>
+        <span class="s8-hier-use">Convenciones tuyas que aplicás siempre. No se versionan con ningún repo.</span>
+      </div>
+    </div>
+    <div class="s8-hier-row">
+      <div class="s8-hier-level">
+        <span class="s8-hier-level-num">Nivel 2</span>
+        <span class="s8-hier-level-name">Proyecto</span>
+      </div>
+      <div class="s8-hier-content">
+        <span class="s8-hier-title">Reglas del equipo, versionadas con el código</span>
+        <span class="s8-hier-paths"><code>./.claude/rules/</code></span>
+        <span class="s8-hier-use">Código, tests, seguridad, APIs. Las lee todo el que abre el proyecto.</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="s8-hier-note">Podés agrupar rules en subcarpetas (<code>rules/backend/</code>, <code>rules/deploy/</code>): Claude Code recorre <code>.claude/rules/</code> entera, sin registrar archivos.</p>
+  <p class="s8-hier-note"><strong>La carga la decide el frontmatter, no la subcarpeta.</strong></p>
+
+  <aside class="notes">
+    <p><strong>Recorrer los dos niveles y cerrar con la nota de subcarpetas.</strong></p>
+    <p><u>Dos filas: usuario y proyecto; la nota aclara que agrupar en subcarpetas no vuelve condicional a una rule.</u></p>
+    <p><em>"Segunda pregunta: dónde viven. Dos ubicaciones: nivel usuario, en tu home dentro de .claude/rules/, con reglas que te seguís de un repo al otro y no viajan al equipo; y nivel proyecto, en la raíz del repo, versionadas con el código. Las rules pueden estar agrupadas en subcarpetas: si en un repo grande querés partirlas por subsistema, armás rules/backend/, rules/deploy/, y Claude Code recorre todo .claude/rules/. No hay manifiesto que mantener. Y ojo con esto: poner una rule en rules/backend/ no la hace condicional. Una rule sin paths en esa subcarpeta se carga al arrancar igual que si estuviera en la raíz. Las subcarpetas son organización; la condición la pone el frontmatter."</em></p>
+  </aside>
+</section>
+
+<!-- §8.3b · Equivalencias: la misma pieza en Codex y OpenCode (sin mini-strip) -->
+<section class="s8-slide">
+  <h2>Carga condicional: acá los tres no coinciden</h2>
+
+  <div class="harness-map is-large">
+    <div class="harness-map-col is-ref">
+      <span class="harness-map-tool">Claude Code</span>
+      <span class="harness-map-path">.claude/rules/*.md</span>
+      <p class="harness-map-note">Con <code>paths:</code> en el frontmatter, la rule entra cuando se lee un archivo que matchea el glob.</p>
+    </div>
+    <div class="harness-map-col">
+      <span class="harness-map-tool">Codex</span>
+      <span class="harness-map-path">AGENTS.md por carpeta</span>
+      <p class="harness-map-note">Scope por directorio, no por glob. Se arma al arrancar según dónde abriste la sesión.</p>
+    </div>
+    <div class="harness-map-col">
+      <span class="harness-map-tool">OpenCode</span>
+      <span class="harness-map-path">instructions</span>
+      <p class="harness-map-note is-warn">Los globs eligen <strong>qué</strong> archivos cargar, no <strong>cuándo</strong>: entran todos al arrancar.</p>
+    </div>
+  </div>
+
+  <p class="harness-map-foot">El concepto es portable: instrucciones que entran solo cuando importan. La forma declarativa, por glob, hoy es de Claude Code.</p>
+
+  <aside class="notes">
+    <p><strong>La única pieza sin equivalente directo. Decirlo así, sin vueltas.</strong></p>
+    <p><u>Carga condicional por path: Claude Code la declara; Codex y OpenCode la aproximan.</u></p>
+    <p><em>"Acá los tres no coinciden, y conviene saberlo. Lo que hace rules con paths, cargar una instrucción recién cuando el agente lee un archivo que matchea un glob, no existe tal cual en los otros dos. Codex se acerca con un AGENTS.md por carpeta: si abrís la sesión adentro de backend, carga el de backend. Pero es por directorio, no por patrón, y se decide al arrancar. OpenCode tiene instructions con globs, pero el glob elige qué archivos cargar, no cuándo: entran todos al principio y cuestan contexto desde el primer mensaje. Así que el concepto viaja, instrucciones que entran solo cuando importan, pero si tu proyecto depende de eso y lo querés en otra herramienta, lo vas a tener que resolver con carpetas."</em></p>
+  </aside>
+</section>
+
+<!-- §8.4 · Cuándo se cargan — sin frontmatter vs con paths: -->
+<section class="s8-slide">
+  <ol class="s8-five-q-grid is-mini">
+    <li class="s8-five-q-card"><span class="s8-five-q-num">1</span><span class="s8-five-q-label">Qué es</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">2</span><span class="s8-five-q-label">Dónde vive</span></li>
+    <li class="s8-five-q-card is-active"><span class="s8-five-q-num">3</span><span class="s8-five-q-label">Cuándo se carga</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">4</span><span class="s8-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>El frontmatter decide cuándo entra la rule al contexto</h2>
+
+  <div class="s8-compare">
+    <div class="s8-compare-col is-always">
+      <span class="s8-compare-tag">Modo A</span>
+      <h3 class="s8-compare-h3">Sin frontmatter: <strong>siempre cargada</strong></h3>
+      <span class="s8-compare-file">.claude/rules/api-y-datos.md (extracto)</span>
+      <pre class="s8-compare-code"><span class="c"># API y datos</span>
+
+- El slug del juego viaja en el path y no se repite en el body.
+- `created_at` lo pone el servidor, nunca el cliente.
+<span class="c">…</span></pre>
+      <p class="s8-compare-body">
+        El archivo arranca directo con el cuerpo, sin bloque YAML adelante.
+        El runtime la carga al iniciar la sesión, igual que un CLAUDE.md.
+      </p>
+      <p class="s8-compare-cost"><strong>Costo:</strong> el mismo que CLAUDE.md.</p>
+    </div>
+
+    <div class="s8-compare-col is-scoped">
+      <span class="s8-compare-tag">Modo B</span>
+      <h3 class="s8-compare-h3">Con <code>paths:</code>, <strong>path-scoped</strong></h3>
+      <span class="s8-compare-file">.claude/rules/escenas-de-juego.md (extracto)</span>
+      <pre class="s8-compare-code"><span class="c">---</span>
+<span class="k">paths:</span>
+  - <span class="y">"frontend/js/games/**/*.js"</span>
+  - <span class="y">"frontend/js/game-page.js"</span>
+<span class="c">---</span>
+<span class="c">…</span></pre>
+      <p class="s8-compare-body">
+        El frontmatter declara uno o más globs. La rule entra al contexto recién
+        cuando Claude lee un archivo cuyo path matchea.
+      </p>
+      <p class="s8-compare-cost"><strong>Costo:</strong> cero hasta que es relevante.</p>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Ir columna por columna, izquierda primero; en la derecha leer el glob completo.</strong></p>
+    <p><u>Slide central de §8: siempre cargada (costo de CLAUDE.md) contra path-scoped (costo cero hasta que matchea).</u></p>
+    <p><em>"Tercera pregunta: cuándo se carga. Dos ramas, y la decisión vive en una sola cosa: si el archivo arranca con frontmatter YAML o no. Modo A, sin frontmatter: acá está el comienzo de api-y-datos.md del repo del TP, arranca directo con el cuerpo. El runtime la carga al iniciar la sesión y queda en la ventana; cuesta lo mismo que si esas líneas estuvieran en CLAUDE.md. Modo B, con paths: el comienzo de escenas-de-juego.md, un bloque YAML con dos globs, los archivos de juegos y la página que los monta. La rule entra recién cuando Claude lee un archivo cuyo path cae en alguno de los dos. Si toda la sesión transcurre en el backend, esta rule nunca aparece. Se parece al caso de los CLAUDE.md de subdirectorio que vimos antes, pero con otro mecanismo: CLAUDE.md lo hace por carpeta; rules, por glob explícito, que es más fino."</em></p>
+  </aside>
+</section>
+
+<!-- §8.5 · Cómo se usa — frontmatter de escenas-de-juego.md + globs -->
+<section class="s8-slide">
+  <ol class="s8-five-q-grid is-mini">
+    <li class="s8-five-q-card"><span class="s8-five-q-num">1</span><span class="s8-five-q-label">Qué es</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">2</span><span class="s8-five-q-label">Dónde vive</span></li>
+    <li class="s8-five-q-card"><span class="s8-five-q-num">3</span><span class="s8-five-q-label">Cuándo se carga</span></li>
+    <li class="s8-five-q-card is-active"><span class="s8-five-q-num">4</span><span class="s8-five-q-label">Cómo se usa</span></li>
+  </ol>
+
+  <h2>Frontmatter YAML arriba, cuerpo Markdown abajo</h2>
+
+  <div class="s8-howto-wrap">
+    <div class="s8-howto-path">.claude/rules/escenas-de-juego.md (extracto, path-scoped a los juegos)</div>
+
+    <pre class="s8-howto-code"><span class="c">---</span>
+<span class="k">description:</span> Reglas para escribir o modificar una Phaser.Scene.
+<span class="k">paths:</span>
+  - <span class="y">"frontend/js/games/**/*.js"</span>
+  - <span class="y">"frontend/js/game-page.js"</span>
+<span class="c">---</span>
+
+<span class="c"># Escenas de juego</span>
+<span class="c">…</span>
+- La escena no importa `api.js`, no hace `fetch` y no sabe que existe un ranking.
+- El teclado va por `onKeys()`, nunca `scene.input.keyboard.on(...)` directo.
+<span class="c">…</span></pre>
+
+    <div class="s8-globs">
+      <h3 class="s8-howto-h3">Patrones de glob</h3>
+      <div class="s8-globs-grid">
+        <span class="s8-glob-pat">**/*.py</span>
+        <span class="s8-glob-text">cualquier <code>.py</code> del árbol</span>
+        <span class="s8-glob-pat">src/**/*</span>
+        <span class="s8-glob-text">todo lo que cuelga de <code>src/</code></span>
+        <span class="s8-glob-pat">*.md</span>
+        <span class="s8-glob-text">Markdown solo en la raíz</span>
+        <span class="s8-glob-pat">backend/**/*.{py,yaml}</span>
+        <span class="s8-glob-text">llaves para varias extensiones</span>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Leer el frontmatter línea por línea, después el cuerpo, y cerrar con los cuatro patrones.</strong></p>
+    <p><u>Anatomía real de escenas-de-juego.md (extracto) y los patrones de glob habituales.</u></p>
+    <p><em>"Cuarta pregunta: cómo se usa. Este es escenas-de-juego.md del repo del TP; lo que ven es un extracto del archivo real. Arriba, frontmatter YAML, delimitado por tres guiones arriba y tres abajo; adentro, una descripción y una clave paths con dos globs. Debajo del segundo separador empieza el cuerpo, Markdown común. El cuerpo es lo que entra al contexto cuando la rule se activa: que la escena no habla con la API, y que el teclado va siempre por onKeys, que es la corrección de un bug real que está contado en el README. Esas instrucciones están solo en esta rule, no en CLAUDE.md, y las vamos a usar en el demo. Abajo, los patrones que vas a usar casi siempre: asterisco simple matchea dentro de un nivel, doble asterisco a cualquier profundidad, y las llaves expanden alternativas separadas por coma."</em></p>
+  </aside>
+</section>
+
+<!-- §8.6 · Las rules del repo — lista (sin mini-strip) -->
+<section class="s8-slide">
+  <h2>Las dos rules del repo</h2>
+
+  <ul class="s8-rules-list">
+    <li>
+      <strong><code>api-y-datos.md</code></strong>: sin frontmatter, <em>siempre cargada</em>.
+      Contrato de los endpoints, status codes en uso, fechas del servidor, orden del ranking.
+    </li>
+    <li class="is-scoped">
+      <strong><code>escenas-de-juego.md</code></strong>: <code>paths:</code> a <code>frontend/js/games/</code>, <em>solo al leer un archivo de juegos</em>.
+      La escena no habla con la API, el teclado va por <code>onKeys()</code>, cómo termina una partida.
+    </li>
+  </ul>
+
+  <aside class="notes">
+    <p><strong>Recorrer los dos ítems; el segundo es el path-scoped y el que usa el demo.</strong></p>
+    <p><u>Zoom al repo del TP: una rule siempre cargada y una path-scoped (marcador en otro color).</u></p>
+    <p><em>"Bajemos a tierra. El repo del TP tiene dos rules, una de cada tipo. Api-y-datos va sin frontmatter, así que está desde el arranque: el contrato de los endpoints, qué status codes se usan, que la fecha la pone el servidor, cómo se ordena el ranking. Son decisiones que valen para todo el proyecto y cuestan pocas líneas. Escenas-de-juego es la scoped: solo entra cuando Claude lee un archivo de los juegos. Lo que prescribe, que la escena no habla con la API y que el teclado va por onKeys, no le sirve de nada a alguien tocando el backend. Y fíjense que eso no está en el CLAUDE.md del repo: vive únicamente en esta rule. Esta es la que vamos a hacer aparecer en el demo."</em></p>
+  </aside>
+</section>
+
+<!-- §8.8 · Demo · /context antes, durante y después (section-divider + clickable-steps) -->
+<section class="section-divider">
+  <h2>Demo · /context antes, durante y después</h2>
+  <p class="s8-demo-lead">Hacer visible que <code>escenas-de-juego.md</code> entra al contexto solo cuando Claude lee un archivo de los juegos.</p>
+
+  <div class="s8-demo-wrap">
+    <div id="s8-demo-steps"></div>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Setup de siempre (ver §7.9), con VS Code mostrando .claude/rules/.</strong></p>
+    <p><u>Tres pasos sobre la misma sesión, con /context entre cada uno: escenas-de-juego.md aparece recién en el último.</u></p>
+    <p><em>"Vamos al demo. Tres pasos sobre la misma sesión. El objetivo es ver, con /context, cómo escenas-de-juego.md cambia de estado: no cargada, no cargada, cargada, y en qué momento exacto entra."</em></p>
+    <hr>
+    <p><strong>Acciones (copiables):</strong></p>
+    <p>Setup de siempre: <code>~/tp-final-demo</code> con git init, <code>claude --permission-mode default</code>. Van a aparecer también mi <code>~/.claude/CLAUDE.md</code> y mis rules de usuario entre los memory files.</p>
+    <p><strong>Paso 1 · Sin leer nada del backend</strong></p>
+    <ul>
+      <li><strong>VS Code:</strong> abrir <code>.claude/rules/</code> y ver los 4 archivos</li>
+      <li><strong>VS Code:</strong> en <code>escenas-de-juego.md</code>, señalar el frontmatter <code>paths:</code></li>
+      <li><strong>En Claude:</strong> <code>/context</code></li>
+      <li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> NO figura entre los memory files</li>
+    </ul>
+    <p><strong>Paso 2 · Un archivo que no matchea</strong></p>
+    <ul>
+      <li><strong>En Claude:</strong> "leé <code>backend/routes.py</code>"</li>
+      <li><strong>En Claude:</strong> <code>/context</code></li>
+      <li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> sigue sin aparecer</li>
+    </ul>
+    <p><strong>Paso 3 · Un archivo que sí matchea</strong></p>
+    <ul>
+      <li><strong>En Claude:</strong> "leé <code>frontend/js/games/snake.js</code>"</li>
+      <li><strong>Mirar:</strong> el aviso de carga de la rule en la terminal</li>
+      <li><strong>En Claude:</strong> <code>/context</code></li>
+      <li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> ahora figura entre los memory files</li>
+    </ul>
+    <p><em>Plan B (si /context no deja ver el cambio): demostrar por comportamiento. La regla de onKeys() está solo en escenas-de-juego.md. Hacer /clear y pedirle a Claude, sin nombrar la rule, que agregue una tecla de pausa a Snake: tiene que usar onKeys() de common.js y no keyboard.on(). Contraste: /clear y pedirle un cambio en backend/routes.py; ahí esa rule nunca entra.</em></p>
+  </aside>
+</section>
+
+<!-- §8.9 · Cierre -->
+<section class="s8-slide">
+  <h2>Modulares por archivo, condicionales por path</h2>
+
+  <div class="s8-close-card">
+    <p class="s8-close-main">
+      Rules parte las instrucciones del agente en archivos chicos por tema,
+      con la opción de declarar <strong>cuándo</strong> entra cada una al contexto, además de <strong>qué</strong> dice.
+      El concepto sirve en cualquier harness; declararlo por glob, hoy, solo en Claude Code.
+    </p>
+    <p class="s8-close-bridge">
+      CLAUDE.md y rules son <em>instrucciones para el agente</em>: Markdown que le dice qué hacer.
+      Otra cosa es la <em>configuración del runtime</em>: JSON que le dice al programa que envuelve al agente cómo correrlo.
+    </p>
+  </div>
+
+  <aside class="notes">
+    <p><strong>Apoyar "modulares por archivo, condicionales por path" y marcar el contraste instrucciones / configuración.</strong></p>
+    <p><u>Cierre de §8 y salto a §9: de instrucciones en Markdown para el agente a configuración en JSON para el runtime.</u></p>
+    <p><em>"Cerramos rules. La propiedad central: partir las instrucciones en archivos chicos por tema, con la opción de declarar cuándo entra cada una al contexto, no solo qué dice. Modulares por archivo, condicionales por path. La idea de que una instrucción entre solo cuando importa la vas a buscar en cualquier herramienta; la forma de declararla con un glob, por ahora, es de Claude Code. Y acá hay un salto que vale la pena marcar. CLAUDE.md y rules son instrucciones para el agente: Markdown que le habla al modelo, en lenguaje natural. Lo que sigue, settings.json, es distinto en naturaleza: es JSON y no le habla al agente, le habla al programa que lo corre. No es 'cuando trabajes en backend, hacé esto'; es 'cuando Claude termine un turno, ejecutá este hook'. Cambia el canal: del agente al sistema que lo corre."</em></p>
+  </aside>
+</section>
+
+<!-- INIT-SCRIPTS-§8-START -->
+<script>
+  initClickableSteps({containerId: 's8-demo-steps', steps: [
+    {
+      title: 'Paso 1 · Sin leer nada del backend',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>VS Code:</strong> abrir <code>.claude/rules/</code> y ver los 2 archivos</li><li><strong>VS Code:</strong> en <code>escenas-de-juego.md</code>, señalar el frontmatter <code>paths:</code></li><li><strong>En Claude:</strong> <code>/context</code></li><li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> NO figura entre los memory files</li></ul>',
+      example: 'Entre los memory files de /context aparece api-y-datos.md, la rule sin frontmatter. escenas-de-juego.md no: está en disco, abierta en VS Code, pero no en la ventana del agente.'
+    },
+    {
+      title: 'Paso 2 · Un archivo que no matchea',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>En Claude:</strong> "leé <code>backend/routes.py</code>"</li><li><strong>En Claude:</strong> <code>/context</code></li><li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> sigue sin aparecer</li></ul>',
+      example: 'Claude leyó un archivo, pero no es uno de los juegos. Ninguno de los dos globs matchea y escenas-de-juego.md sigue fuera de la ventana. Lo que sí entró es el CLAUDE.md de backend/, que carga al leer un archivo de esa carpeta.'
+    },
+    {
+      title: 'Paso 3 · Un archivo que sí matchea',
+      summary: '<ul style="font-size:0.88em;padding-left:16px;margin:4px 0 0;line-height:1.5;text-align:left;"><li><strong>En Claude:</strong> "leé <code>frontend/js/games/snake.js</code>"</li><li><strong>Mirar:</strong> el aviso de carga de la rule en la terminal</li><li><strong>En Claude:</strong> <code>/context</code></li><li><strong>Mirar:</strong> <code>escenas-de-juego.md</code> ahora figura entre los memory files</li></ul>',
+      example: 'Al leer snake.js, la terminal avisa que cargó .claude/rules/escenas-de-juego.md y /context la muestra entre los memory files. Hasta este momento no ocupó nada de la ventana.'
+    }
+  ]});
+</script>
+<!-- INIT-SCRIPTS-§8-END -->

@@ -1,0 +1,307 @@
+openapi: 3.1.0
+info:
+  title: IC Bring-up Lab API
+  description: API para el registro de muestras físicas de chips y los ensayos de caracterización ejecutados sobre sus macros (Tx, Rx, PLL) durante el proceso de bring-up en laboratorio.
+  version: 1.0.0
+
+paths:
+  /chips:
+    get:
+      summary: Listar chips
+      description: Obtiene el listado de todas las muestras de chips registradas.
+      operationId: listChips
+      tags:
+        - Chips
+      responses:
+        '200':
+          description: Listado de chips.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chip'
+    post:
+      summary: Registrar un chip
+      description: Crea una nueva muestra de chip.
+      operationId: createChip
+      tags:
+        - Chips
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChipInput'
+      responses:
+        '201':
+          description: Chip creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chip'
+        '400':
+          description: Faltan campos requeridos o los datos son inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /chips/{chipId}:
+    delete:
+      summary: Eliminar un chip
+      description: Elimina una muestra física de chip y todos los ensayos asociados a sus macros.
+      operationId: deleteChip
+      tags:
+        - Chips
+      parameters:
+        - $ref: '#/components/parameters/ChipId'
+      responses:
+        '204':
+          description: Chip y ensayos asociados eliminados exitosamente. Sin contenido.
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /chips/{chipId}/macros/{macro}/tests:
+    get:
+      summary: Listar ensayos de una macro
+      description: Obtiene los ensayos de caracterización registrados para una macro específica de un chip.
+      operationId: listTests
+      tags:
+        - Tests
+      parameters:
+        - $ref: '#/components/parameters/ChipId'
+        - $ref: '#/components/parameters/Macro'
+        - name: passed
+          in: query
+          required: false
+          description: Filtra los ensayos por resultado aprobado/fallido.
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Listado de ensayos de la macro indicada.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+        '400':
+          description: El valor de macro no corresponde a Tx, Rx o PLL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Registrar un ensayo en una macro
+      description: Crea un nuevo ensayo de caracterización sobre la macro indicada de un chip.
+      operationId: createTest
+      tags:
+        - Tests
+      parameters:
+        - $ref: '#/components/parameters/ChipId'
+        - $ref: '#/components/parameters/Macro'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestInput'
+      responses:
+        '201':
+          description: Ensayo creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+        '400':
+          description: Datos de entrada inválidos en el body o macro fuera del enum.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /chips/{chipId}/macros/{macro}/tests/{testId}:
+    delete:
+      summary: Eliminar un ensayo
+      description: Elimina un ensayo de caracterización de una macro específica de un chip.
+      operationId: deleteTest
+      tags:
+        - Tests
+      parameters:
+        - $ref: '#/components/parameters/ChipId'
+        - $ref: '#/components/parameters/Macro'
+        - name: testId
+          in: path
+          required: true
+          description: Identificador del ensayo.
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Ensayo eliminado exitosamente. Sin contenido.
+        '400':
+          description: El valor de macro no corresponde a Tx, Rx o PLL.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip o el ensayo no existen en esa macro.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  parameters:
+    ChipId:
+      name: chipId
+      in: path
+      required: true
+      description: Identificador del chip.
+      schema:
+        type: integer
+    Macro:
+      name: macro
+      in: path
+      required: true
+      description: Macro interna del chip sobre la que se organizan los ensayos.
+      schema:
+        type: string
+        enum: ["Tx", "Rx", "PLL"]
+
+  schemas:
+    Chip:
+      type: object
+      description: Muestra física de un chip registrada en el sistema.
+      required:
+        - id
+        - part_number
+        - board
+      properties:
+        id:
+          type: integer
+          description: Identificador único del chip, asignado por el servidor.
+        part_number:
+          type: string
+          description: Número de parte del chip.
+          examples: ["CHIP001"]
+        board:
+          type: string
+          description: Placa o kit de evaluación en la que está montado el chip.
+          examples: ["EVK-1"]
+        assembled_at:
+          type: string
+          format: date
+          description: Fecha de ensamblado de la muestra.
+
+    ChipInput:
+      type: object
+      description: Datos necesarios para registrar un nuevo chip.
+      required:
+        - part_number
+        - board
+      properties:
+        part_number:
+          type: string
+          examples: ["CHIP001"]
+        board:
+          type: string
+          examples: ["EVK-1"]
+        assembled_at:
+          type: string
+          format: date
+
+    Test:
+      type: object
+      description: Ensayo de caracterización ejecutado sobre una macro de un chip.
+      required:
+        - id
+        - chip_id
+        - macro
+        - metric
+        - measured_value
+        - unit
+        - passed
+      properties:
+        id:
+          type: integer
+          description: Identificador único del ensayo, asignado por el servidor.
+        chip_id:
+          type: integer
+          description: Identificador del chip al que pertenece el ensayo, tomado del parámetro {chipId} del path.
+        macro:
+          type: string
+          enum: ["Tx", "Rx", "PLL"]
+          description: Macro sobre la que se ejecutó el ensayo, tomada del parámetro {macro} del path.
+        metric:
+          type: string
+          description: Nombre del parámetro medido.
+          examples: ["gain"]
+        measured_value:
+          type: number
+          format: float
+          description: Valor medido para la métrica.
+        unit:
+          type: string
+          description: Unidad de la métrica medida.
+          examples: ["dB"]
+        passed:
+          type: boolean
+          description: Indica si el ensayo fue aprobado.
+        measured_at:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se realizó la medición.
+
+    TestInput:
+      type: object
+      description: Datos transportados en el body para registrar un nuevo ensayo.
+      required:
+        - metric
+        - measured_value
+        - unit
+        - passed
+      properties:
+        metric:
+          type: string
+          examples: ["gain"]
+        measured_value:
+          type: number
+          format: float
+        unit:
+          type: string
+          examples: ["dB"]
+        passed:
+          type: boolean
+        measured_at:
+          type: string
+          format: date-time
+
+    Error:
+      type: object
+      description: Respuesta de error estándar.
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Mensaje descriptivo del problema.

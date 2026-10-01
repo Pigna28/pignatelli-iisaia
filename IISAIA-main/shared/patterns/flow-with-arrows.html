@@ -1,0 +1,19 @@
+<!--
+  Pattern: Flow with arrows
+  When to use: A short sequential process (3-5 steps), horizontal layout, with arrows.
+  Canonical example: semanas/01/slides/index.html:1616 ("Conversaciones como datos")
+-->
+<section>
+  <h2>Título del proceso</h2>
+  <div style="display: flex; align-items: center; gap: 12px; justify-content: center;">
+    <div class="flow-step">Paso 1</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Paso 2</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step active">Paso 3</div>
+  </div>
+  <aside class="notes">
+    <p><u>Proceso de N pasos. Paso clave en .active.</u></p>
+    <p><em>"El proceso es paso 1, paso 2, paso 3. Lo importante es [el paso clave] — ahí es donde [explicación concreta]."</em></p>
+  </aside>
+</section>

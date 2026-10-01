@@ -1,0 +1,34 @@
+<!--
+  Pattern: Pipeline roadmap
+  When to use: A multi-stage process you want to introduce step-by-step and return to throughout
+    the week, re-highlighting different groups of nodes. Use group="..." attributes to enable
+    .highlight-<group> class on the parent .pipe-grid for re-emphasis later.
+  Canonical example: semanas/01/slides/index.html:319 ("Construyamos un LLM")
+-->
+<section>
+  <h2>Construyamos algo</h2>
+  <div class="pipe-grid" id="my-pipe">
+    <div class="pipe-node fragment" data-group="A" data-fragment-index="0">
+      <div class="pipe-icon">●</div>
+      <div class="pipe-label">Etapa 1</div>
+      <div class="pipe-sub">subtexto</div>
+    </div>
+    <span class="pipe-arrow fragment" data-fragment-index="1">→</span>
+    <div class="pipe-node fragment" data-group="A" data-fragment-index="2">
+      <div class="pipe-icon">●</div>
+      <div class="pipe-label">Etapa 2</div>
+      <div class="pipe-sub">subtexto</div>
+    </div>
+    <span class="pipe-arrow fragment" data-fragment-index="3">→</span>
+    <div class="pipe-node fragment" data-group="B" data-fragment-index="4">
+      <div class="pipe-icon">●</div>
+      <div class="pipe-label">Etapa 3</div>
+      <div class="pipe-sub">subtexto</div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Revelar etapas con fragmentos. Volver más tarde con .highlight-A o .highlight-B en el .pipe-grid.</strong></p>
+    <p><u>Roadmap de la clase. Mapa al que se vuelve.</u></p>
+    <p><em>"Construyamos esto juntos. La primera etapa es [Etapa 1]. Después [Etapa 2]. Al final, [Etapa 3]. Vamos a recorrer cada una en detalle. Quedate con este mapa, vamos a volver."</em></p>
+  </aside>
+</section>

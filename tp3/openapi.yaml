@@ -1,0 +1,720 @@
+openapi: 3.1.0
+info:
+  title: IC Bring-up Lab API
+  description: API para el registro de muestras físicas de chips y los ensayos de
+    caracterización ejecutados sobre sus macros (Tx, Rx, PLL) durante el proceso de
+    bring-up en laboratorio. Laboratorio compartido. Cookie de sesión en modo Auth0;
+    modo local solo en loopback. Antes de escribir, obtener X-CSRF-Token de GET /session.
+  version: 1.1.0
+paths:
+  /chips:
+    get:
+      summary: Listar chips
+      description: Obtiene el listado de todas las muestras de chips registradas.
+      operationId: listChips
+      tags:
+      - Chips
+      responses:
+        '200':
+          description: Listado de chips.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Chip'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Registrar un chip
+      description: Crea una nueva muestra de chip.
+      operationId: createChip
+      tags:
+      - Chips
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChipInput'
+      responses:
+        '201':
+          description: Chip creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chip'
+        '400':
+          description: Entrada inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+      - $ref: '#/components/parameters/CSRF'
+  /chips/{chipId}:
+    delete:
+      summary: Eliminar un chip
+      description: Elimina una muestra física de chip y todos los ensayos asociados
+        a sus macros.
+      operationId: deleteChip
+      tags:
+      - Chips
+      parameters:
+      - $ref: '#/components/parameters/ChipId'
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '204':
+          description: Chip y ensayos asociados eliminados exitosamente. Sin contenido.
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Entrada inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/tests:
+    get:
+      summary: Listar ensayos de una macro
+      description: Obtiene los ensayos de caracterización registrados para una macro
+        específica de un chip.
+      operationId: listTests
+      tags:
+      - Tests
+      parameters:
+      - $ref: '#/components/parameters/ChipId'
+      - $ref: '#/components/parameters/Macro'
+      - name: passed
+        in: query
+        required: false
+        description: Filtra los ensayos por resultado aprobado/fallido.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Listado de ensayos de la macro indicada.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+        '400':
+          description: Entrada inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Registrar un ensayo en una macro
+      description: Crea un nuevo ensayo de caracterización sobre la macro indicada
+        de un chip.
+      operationId: createTest
+      tags:
+      - Tests
+      parameters:
+      - $ref: '#/components/parameters/ChipId'
+      - $ref: '#/components/parameters/Macro'
+      - $ref: '#/components/parameters/CSRF'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestInput'
+      responses:
+        '201':
+          description: Ensayo creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+        '400':
+          description: Entrada inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip indicado no existe.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/tests/{testId}:
+    delete:
+      summary: Eliminar un ensayo
+      description: Elimina un ensayo de caracterización de una macro específica de
+        un chip.
+      operationId: deleteTest
+      tags:
+      - Tests
+      parameters:
+      - $ref: '#/components/parameters/ChipId'
+      - $ref: '#/components/parameters/Macro'
+      - name: testId
+        in: path
+        required: true
+        description: Identificador del ensayo.
+        schema:
+          type: integer
+          minimum: 1
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '204':
+          description: Ensayo eliminado exitosamente. Sin contenido.
+        '400':
+          description: Entrada inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: El chip o el ensayo no existen en esa macro.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso o CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /summary:
+    get:
+      operationId: getSummary
+      tags:
+      - Laboratorio
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /session:
+    get:
+      operationId: getSession
+      tags:
+      - Laboratorio
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /audit:
+    get:
+      operationId: listAudit
+      tags:
+      - Laboratorio
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditEvent'
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Sin permiso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Base temporalmente no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '400':
+          description: Paginación inválida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      parameters:
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: before
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+  /health:
+    get:
+      operationId: health
+      security: []
+      responses:
+        '200':
+          description: Base accesible.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - status
+                properties:
+                  status:
+                    const: ok
+        '503':
+          description: Base no disponible.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /logout:
+    post:
+      operationId: logout
+      parameters:
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '200':
+          description: Sesión local cerrada; navegar a redirect para cerrar Auth0.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - redirect
+                properties:
+                  redirect:
+                    type: string
+        '401':
+          description: Sesión requerida.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  parameters:
+    ChipId:
+      name: chipId
+      in: path
+      required: true
+      description: Identificador del chip.
+      schema:
+        type: integer
+        minimum: 1
+    Macro:
+      name: macro
+      in: path
+      required: true
+      description: Macro interna del chip sobre la que se organizan los ensayos.
+      schema:
+        type: string
+        enum:
+        - Tx
+        - Rx
+        - PLL
+    CSRF:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      description: Valor csrf_token de GET /session, usando la misma cookie.
+      schema:
+        type: string
+  schemas:
+    Chip:
+      type: object
+      description: Muestra física de un chip registrada en el sistema.
+      required:
+      - id
+      - part_number
+      - board
+      properties:
+        id:
+          type: integer
+          description: Identificador único del chip, asignado por el servidor.
+          minimum: 1
+        part_number:
+          type: string
+          description: Número de parte del chip.
+          examples:
+          - CHIP001
+          minLength: 1
+          maxLength: 120
+        board:
+          type: string
+          description: Placa o kit de evaluación en la que está montado el chip.
+          examples:
+          - EVK-1
+          minLength: 1
+          maxLength: 120
+        assembled_at:
+          type: string
+          format: date
+          description: Fecha de ensamblado de la muestra.
+      additionalProperties: false
+    ChipInput:
+      type: object
+      description: Datos necesarios para registrar un nuevo chip.
+      required:
+      - part_number
+      - board
+      properties:
+        part_number:
+          type: string
+          examples:
+          - CHIP001
+          minLength: 1
+          maxLength: 120
+        board:
+          type: string
+          examples:
+          - EVK-1
+          minLength: 1
+          maxLength: 120
+        assembled_at:
+          type: string
+          format: date
+      additionalProperties: false
+    Test:
+      type: object
+      description: Ensayo de caracterización ejecutado sobre una macro de un chip.
+      required:
+      - id
+      - chip_id
+      - macro
+      - metric
+      - measured_value
+      - unit
+      - passed
+      properties:
+        id:
+          type: integer
+          description: Identificador único del ensayo, asignado por el servidor.
+          minimum: 1
+        chip_id:
+          type: integer
+          description: Identificador del chip al que pertenece el ensayo, tomado del
+            parámetro {chipId} del path.
+          minimum: 1
+        macro:
+          type: string
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          description: Macro sobre la que se ejecutó el ensayo, tomada del parámetro
+            {macro} del path.
+        metric:
+          type: string
+          description: Nombre del parámetro medido.
+          examples:
+          - gain
+          minLength: 1
+          maxLength: 120
+        measured_value:
+          type: number
+          format: float
+          description: Valor medido para la métrica.
+        unit:
+          type: string
+          description: Unidad de la métrica medida.
+          examples:
+          - dB
+          minLength: 1
+          maxLength: 120
+        passed:
+          type: boolean
+          description: Indica si el ensayo fue aprobado.
+        measured_at:
+          type: string
+          format: date-time
+          description: Fecha y hora en que se realizó la medición.
+      additionalProperties: false
+    TestInput:
+      type: object
+      description: Datos transportados en el body para registrar un nuevo ensayo.
+      required:
+      - metric
+      - measured_value
+      - unit
+      - passed
+      properties:
+        metric:
+          type: string
+          examples:
+          - gain
+          minLength: 1
+          maxLength: 120
+        measured_value:
+          type: number
+          format: float
+        unit:
+          type: string
+          examples:
+          - dB
+          minLength: 1
+          maxLength: 120
+        passed:
+          type: boolean
+        measured_at:
+          type: string
+          format: date-time
+      additionalProperties: false
+    Error:
+      type: object
+      description: Respuesta de error estándar.
+      required:
+      - error
+      properties:
+        error:
+          type: string
+          description: Mensaje descriptivo del problema.
+    Summary:
+      type: object
+      additionalProperties: false
+      required:
+      - chips
+      - tests
+      - passed
+      - failed
+      properties:
+        chips:
+          type: integer
+          minimum: 0
+        tests:
+          type: integer
+          minimum: 0
+        passed:
+          type: integer
+          minimum: 0
+        failed:
+          type: integer
+          minimum: 0
+    Session:
+      type: object
+      required:
+      - user
+      - can_write
+      - mode
+      - csrf_token
+      properties:
+        user:
+          type: object
+          required:
+          - sub
+          - name
+          properties:
+            sub:
+              type: string
+            name:
+              type: string
+        can_write:
+          type: boolean
+        mode:
+          enum:
+          - local
+          - auth0
+        csrf_token:
+          type: string
+    AuditEvent:
+      type: object
+      required:
+      - id
+      - occurred_at
+      - actor
+      - action
+      - resource
+      - resource_id
+      - snapshot
+      properties:
+        id:
+          type: integer
+        occurred_at:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        action:
+          enum:
+          - create
+          - delete
+        resource:
+          enum:
+          - chip
+          - test
+        resource_id:
+          type: integer
+        snapshot:
+          type: object
+          additionalProperties: true
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: lab_session
+servers:
+- url: /
+security:
+- SessionCookie: []

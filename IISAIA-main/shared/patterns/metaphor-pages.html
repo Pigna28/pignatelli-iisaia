@@ -1,0 +1,28 @@
+<!--
+  Pattern: Metaphor with three perspective-skewed cards (the "book pages" pattern)
+  When to use: Bridging an abstract technical concept to a familiar concrete domain (e.g.,
+    learning modes via textbook pages, training pipeline via factory floor).
+  Canonical example: semanas/01/slides/index.html:2243 ("Del libro de texto a la práctica")
+-->
+<section>
+  <h2>Del concepto familiar al concepto técnico</h2>
+  <div style="display: flex; gap: 24px; justify-content: center; align-items: flex-start; perspective: 800px;">
+    <div class="bg-secondary-card" style="width: 200px; transform: rotateY(-15deg); cursor: pointer;">
+      <h3 style="color: var(--accent);">Página del libro</h3>
+      <p>Descripción del concepto familiar.</p>
+    </div>
+    <div class="bg-secondary-card" style="width: 200px; cursor: pointer;">
+      <h3 style="color: var(--accent);">Otra perspectiva</h3>
+      <p>Variación.</p>
+    </div>
+    <div class="bg-secondary-card" style="width: 200px; transform: rotateY(15deg); cursor: pointer;">
+      <h3 style="color: var(--accent);">Tercera perspectiva</h3>
+      <p>Otra variación.</p>
+    </div>
+  </div>
+  <aside class="notes">
+    <p><strong>Click en tarjeta para revelar el equivalente técnico (ver semana 01).</strong></p>
+    <p><u>Metáfora visual: dominio familiar → concepto LLM.</u></p>
+    <p><em>"Pensá en [dominio familiar]. Hay [tres formas / dos modos]. Cada uno corresponde a algo que pasa en el LLM. [familiar 1] es como [técnico 1]..."</em></p>
+  </aside>
+</section>
