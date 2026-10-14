@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, Res
 
 from .db import audit, get_db, record
 from .schemas import ChipInput, Macro, TestInput
+from .thread_store import chip_threads, detail, thread_record
 
 router = APIRouter()
 Id = Annotated[int, Path(gt=0)]
@@ -55,6 +56,7 @@ def delete_chip(chipId: Id, request: Request, db: DB):
         record(row)
         for row in db.execute("SELECT * FROM tests WHERE chip_id=? ORDER BY id", (chipId,))
     ]
+    snapshot["threads"] = chip_threads(db, chipId)
     db.execute("DELETE FROM chips WHERE id=?", (chipId,))
     audit(db, actor(request), "delete", "chip", chipId, snapshot)
     db.commit()
@@ -120,22 +122,30 @@ def delete_test(chipId: Id, macro: Macro, testId: Id, request: Request, db: DB):
     ).fetchone()
     if row is None:
         raise HTTPException(404, "El ensayo no existe en esa macro y chip")
+    snapshot = record(row)
+    migrated = db.execute(
+        "SELECT * FROM thread_overview WHERE legacy_test_id=?", (testId,)
+    ).fetchone()
+    if migrated is not None:
+        snapshot["thread"] = detail(db, thread_record(migrated))
     db.execute("DELETE FROM tests WHERE id=?", (testId,))
-    audit(db, actor(request), "delete", "test", testId, record(row))
+    audit(db, actor(request), "delete", "test", testId, snapshot)
     db.commit()
     return Response(status_code=204)
 
 
 @router.get("/summary", operation_id="getSummary", tags=["Laboratorio"])
 def summary(db: DB):
-    counts = db.execute(
-        "SELECT COUNT(*) total, COALESCE(SUM(passed),0) passed FROM tests"
-    ).fetchone()
+    counts = {
+        row["status"]: row["total"]
+        for row in db.execute("SELECT status,COUNT(*) total FROM thread_overview GROUP BY status")
+    }
     return {
         "chips": db.execute("SELECT COUNT(*) FROM chips").fetchone()[0],
-        "tests": counts["total"],
-        "passed": counts["passed"],
-        "failed": counts["total"] - counts["passed"],
+        "tests": sum(counts.values()),
+        "passed": counts.get("passed", 0),
+        "failed": counts.get("failed", 0),
+        "in_progress": counts.get("in_progress", 0),
     }
 
 

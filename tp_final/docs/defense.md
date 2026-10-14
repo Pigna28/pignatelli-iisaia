@@ -50,8 +50,9 @@ Confirmar esos puntos con la cátedra; esta matriz no inventa una rúbrica ofici
 
 1. **Problema (1 min):** una muestra física contiene tres macros y múltiples
    ensayos. Mostrar por qué el número de parte no identifica la muestra.
-2. **Recorrido (2 min):** alta de muestra, ensayo Tx aprobado, ensayo Rx fallido,
-   filtro, CSV, recarga y persistencia.
+2. **Recorrido (2 min):** alta de muestra, crear hilo Tx, agregar pasos, subir archivo
+   y enlace, cambiar un paso a aprobado y otro a fallido; abrir indicadores globales,
+   filtrar, exportar CSV y recargar para mostrar persistencia.
 3. **Contrato (1 min):** explicar un POST con path, body y respuesta 201; provocar
    una macro inválida (400) y un chip inexistente (404).
 4. **Integridad (1 min):** mostrar que un test no puede borrarse desde otra macro.
@@ -74,6 +75,10 @@ Confirmar esos puntos con la cátedra; esta matriz no inventa una rúbrica ofici
 - ¿Qué bug puede causar una respuesta tardía al cambiar rápidamente de chip?
 - ¿Qué demuestra el 99% de cobertura y qué NO demuestra?
 - ¿Qué habría que cambiar para conectar un instrumento o manejar diez laboratorios?
+- ¿Por qué contar pasos como ensayos duplicaría el total del laboratorio?
+- ¿Qué estado tiene un hilo vacío, uno con pasos pendientes y uno con un paso fallido?
+- ¿Cómo conserva datos y revierte errores la migración v1→v2?
+- ¿Por qué la auditoría conserva metadatos pero no recupera archivos eliminados?
 
 La apropiación se demuestra explicando, corrigiendo y extendiendo el código.
 No presentar este guion como evidencia de una defensa ya realizada.

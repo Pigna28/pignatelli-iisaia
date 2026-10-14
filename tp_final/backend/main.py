@@ -18,6 +18,8 @@ from . import auth
 from .config import ROOT, Settings, load_settings
 from .db import connect, initialize
 from .routes import router
+from .threads import router as threads_router
+from .attachments import router as attachments_router
 
 logger = logging.getLogger("lab")
 
@@ -30,7 +32,7 @@ def create_app(settings: Settings | None = None):
         initialize(settings.database)
         yield
 
-    app = FastAPI(title="IC Bring-up Lab API", version="1.1.0", lifespan=lifespan)
+    app = FastAPI(title="IC Bring-up Lab API", version="2.0.0", lifespan=lifespan)
     app.state.settings = settings
     app.state.oauth = auth.setup_oauth(settings)
     app.middleware("http")(auth.guard)
@@ -106,6 +108,8 @@ def create_app(settings: Settings | None = None):
 
     app.include_router(auth.router)
     app.include_router(router)
+    app.include_router(threads_router)
+    app.include_router(attachments_router)
     app.mount("/assets", StaticFiles(directory=ROOT / "frontend"), name="assets")
 
     def contract():

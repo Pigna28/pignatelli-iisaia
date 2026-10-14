@@ -26,7 +26,8 @@ def test_backup_and_seed(settings, tmp_path):
     backup(settings.database, destination)
     with connect(destination) as db:
         assert db.execute("SELECT COUNT(*) FROM chips").fetchone()[0] == 3
-        assert db.execute("SELECT COUNT(*) FROM tests").fetchone()[0] == 12
+        assert db.execute("SELECT COUNT(*) FROM threads").fetchone()[0] == 12
+        assert db.execute("SELECT COUNT(*) FROM tests").fetchone()[0] == 0
         assert db.execute("PRAGMA integrity_check").fetchone()[0] == "ok"
     with pytest.raises(ValueError):
         backup(settings.database, destination)
@@ -50,7 +51,7 @@ def test_outage_and_headers(client, settings):
     assert len(response.headers["X-Request-ID"]) == 32
     assert client.get("/openapi.yaml").status_code == 200
     with connect(settings.database) as db:
-        db.execute("DROP TABLE tests")
+        db.execute("DROP VIEW thread_overview")
     response = client.get("/summary")
     assert response.status_code == 503
     assert "error" in response.json() and "SELECT" not in response.text

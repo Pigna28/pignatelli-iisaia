@@ -1,5 +1,63 @@
 # Evidencia de verificación
 
+## Correcciones vigentes — 13/10/2026
+
+Entorno: Windows, Python **3.13.14**, Chrome **155.0.8059.41**. Proyecto:
+`pignatelli-iisaia/tp_final`. No se agregaron dependencias.
+
+Comandos ejecutados desde `tp_final` (con el Python de `.venv`):
+
+```powershell
+$env:COVERAGE_FILE = 'artifacts/coverage-v2'
+.\.venv\Scripts\python.exe -m pytest -q --tb=short --basetemp=artifacts/test-run-20261013-c -o cache_dir=artifacts/pytest-cache --cov=backend --cov-fail-under=90
+.\.venv\Scripts\python.exe -m ruff check backend tests scripts run.py
+.\.venv\Scripts\python.exe -m scripts.browser_smoke
+```
+
+Resultados reales:
+
+```text
+79 passed, 2 warnings
+TOTAL: 581 statements, 8 missing; coverage 98.62%
+All checks passed!
+
+browser: 155.0.8059.41
+threads_flow: passed
+five_overviews: passed
+attachments_download: passed
+csv: passed
+persistence: passed
+mobile_overflow: false
+javascript_errors: []
+```
+
+Las pruebas nuevas cubren migración v1→v2 repetida sin duplicados y rollback ante
+fallo de migración; estados derivados; conteos globales; orden de pasos; edición;
+subida, persistencia, descarga y backup de bytes; límites de archivos y cantidad;
+rechazo de extensiones y links no permitidos; jerarquía entre muestras/hilos/pasos;
+autenticación de descarga, permisos de lector y CSRF; rollback de upload si falla
+la auditoría; JSON Schema de las nuevas respuestas y OpenAPI válido.
+
+En navegador se recorrieron los cinco indicadores, se creó un hilo con dos pasos,
+se editaron estados y se cargaron evidencias de ejemplo (PDF, PNG, PPTX y URL),
+verificando transporte y descarga, no validez interna de los formatos. Se comprobó
+persistencia al recargar, eliminación y cancelación, CSV y error de conexión.
+Capturas revisadas a 1440 px y 390 px:
+
+- `artifacts/threads-v2/desktop.png`
+- `artifacts/threads-v2/mobile.png`
+
+La primera ejecución de pytest no pudo usar algunos temporales/cachés heredados
+de la carpeta movida. Se eligieron rutas nuevas de prueba dentro de `artifacts/`,
+sin cambiar permisos globales. La suite detectó también el desfase del schema del
+resumen al añadir `in_progress`; se corrigió en el generador del contrato.
+
+Se mantienen las dos advertencias de deprecación de httpx de Authlib/Starlette.
+No se probaron tenant real Auth0, despliegue ni CI remoto. No se tocó la base de
+trabajo: el servidor aplica la migración al próximo inicio.
+
+## Antecedente — verificación inicial del 30/09/2026
+
 Fecha de trabajo: 30 de septiembre de 2026 (Argentina; 1 de octubre en UTC).
 Entorno Windows, Python 3.13.3, Chrome 154.0.8037.59.
 Versiones Python fijadas en `requirements-lock.txt`.
@@ -81,3 +139,19 @@ La prueba utiliza servidor y base temporales propios y no deja procesos activos.
 El workflow está preparado para Linux y Chromium. No se afirma que esté verde en
 GitHub: no se publicó ni ejecutó durante esta sesión. Tampoco se crearon commits o
 PRs; `git` no estaba disponible en PATH y no había un historial gestionado aquí.
+
+## Demo A0/A1/A2 — 14/10/2026
+
+- Pytest: **82 aprobados**, cobertura backend **98,62%**. Incluye carga sobre base
+  poblada, preservación de ediciones/borrados al repetir, rollback y reintento,
+  distribución de estados y descarga de las nueve evidencias sintéticas por API.
+- Ruff check y format --check: correctos, 29 archivos con formato válido.
+- Chrome 155.0.8059.41: cinco listados, flujo de hilos/pasos, archivos y descarga,
+  CSV y persistencia correctos; sin errores JavaScript ni desborde móvil.
+- Carga local efectiva en `data/lab.db`: 3 chips, 12 hilos, 36 pasos, 9 CSV,
+  60 altas auditadas; `PRAGMA integrity_check` devolvió `ok`.
+- Backup previo: `data/backups/antes-demo-20261014-024615-672674.db`.
+
+Los tests y el navegador usan bases temporales; la carga local fue una operación
+separada y aditiva. Persisten avisos de deprecación de httpx en Starlette/Authlib;
+no se cambiaron dependencias. No hubo cambios de interfaz ni de contrato API.

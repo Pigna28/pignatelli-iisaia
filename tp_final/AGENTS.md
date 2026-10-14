@@ -15,6 +15,10 @@ No editar tp-referencia ni opeanapi.yaml: es el contrato histórico del alumno.
 - Mutación y auditoría forman una sola transacción.
 - Usar textContent para datos del usuario y X-CSRF-Token para escrituras.
 - Modo local exclusivamente loopback/desarrollo. Auth0 en producción.
+- Flujo actual: chips → threads → steps → attachments. Contadores cuentan hilos.
+- Estado derivado: failed si hay fallos; in_progress si vacío/pendiente; passed si todos aprueban.
+- Mantener migración v1→v2 sin perder mediciones; /tests es la API histórica deprecated.
+- Evidencias: máximo 10 MiB por archivo, 20 por paso, descarga autenticada y forzada.
 
 ## Flujo
 

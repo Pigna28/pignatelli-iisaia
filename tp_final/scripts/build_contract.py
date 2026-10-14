@@ -17,7 +17,7 @@ def ref(name):
 
 def build():
     spec = yaml.safe_load((ROOT / "opeanapi.yaml").read_text("utf-8"))
-    spec["info"]["version"] = "1.1.0"
+    spec["info"]["version"] = "2.0.0"
     spec["info"]["description"] += (
         " Laboratorio compartido. Cookie de sesión en modo Auth0; modo local solo en loopback."
         " Antes de escribir, obtener X-CSRF-Token de GET /session."
@@ -63,9 +63,10 @@ def build():
     schemas["Summary"] = {
         "type": "object",
         "additionalProperties": False,
-        "required": ["chips", "tests", "passed", "failed"],
+        "required": ["chips", "tests", "passed", "failed", "in_progress"],
         "properties": {
-            key: {"type": "integer", "minimum": 0} for key in ["chips", "tests", "passed", "failed"]
+            key: {"type": "integer", "minimum": 0}
+            for key in ["chips", "tests", "passed", "failed", "in_progress"]
         },
     }
     schemas["Session"] = {
@@ -89,8 +90,8 @@ def build():
             "id": {"type": "integer"},
             "occurred_at": {"type": "string", "format": "date-time"},
             "actor": {"type": "string"},
-            "action": {"enum": ["create", "delete"]},
-            "resource": {"enum": ["chip", "test"]},
+            "action": {"enum": ["create", "update", "delete"]},
+            "resource": {"enum": ["chip", "test", "thread", "step", "attachment"]},
             "resource_id": {"type": "integer"},
             "snapshot": {"type": "object", "additionalProperties": True},
         },
@@ -160,6 +161,9 @@ def build():
             },
         }
     }
+    from scripts.thread_contract import extend
+
+    extend(spec)
     (ROOT / "openapi.yaml").write_text(
         yaml.safe_dump(spec, allow_unicode=True, sort_keys=False), "utf-8"
     )

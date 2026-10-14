@@ -1,19 +1,38 @@
-# TP3 — IC Bring-up Lab
+# TP final — IC Bring-up Lab
 
-Aplicación web para registrar muestras físicas de circuitos integrados y sus ensayos
-de caracterización en las macros **Tx, Rx y PLL**. Implementa el contrato del TP2
-con interfaz, persistencia SQLite, autenticación Auth0 y trazabilidad de cambios.
+Aplicación web para registrar muestras físicas de circuitos integrados y sus
+**hilos de ensayo** en las macros **Tx, Rx y PLL**. Cada hilo contiene una secuencia
+de pasos con notas, estado, mediciones opcionales y evidencias: documentos,
+presentaciones, imágenes o enlaces. Incluye SQLite, Auth0 y auditoría de cambios.
 
-**Verificación local:** 52 pruebas aprobadas, 99% de cobertura del backend,
-flujo completo en Chrome y revisión visual en escritorio y móvil.
+**Verificación actual (14/10/2026):** 82 pruebas aprobadas, 98,62% de
+cobertura del backend; flujo de hilos, indicadores y archivos probado en Chrome,
+con revisión visual de escritorio y móvil.
 Ver [evidencia y límites](docs/verification.md).
+
+## Correcciones incorporadas
+
+- **En progreso, en amarillo**, tanto en el indicador global como en hilos y pasos.
+- **Cinco indicadores navegables:** muestras, todos los ensayos, en progreso,
+  aprobados y fallidos. Cada uno abre una subsección con todos sus registros,
+  independiente de la muestra seleccionada. Desde allí se abre la muestra o el hilo.
+- **Ensayos como hilos:** alta de hilo, pasos ordenados, edición de notas y estados,
+  medición opcional y carga de evidencias en cada paso.
+- **Migración automática v1→v2:** cada medición existente se conserva como un hilo
+  de un paso. No se agrupan resultados históricos sin conocer su campaña original.
+
+Si el servidor estaba abierto, **reiniciarlo** para cargar el código nuevo y aplicar
+la migración; luego recargar el navegador. Para una base con datos reales, hacer
+primero un backup con `python -m scripts.backup data/backups/antes-v2.db`.
+Las pruebas usan bases temporales. La campaña sintética A0/A1/A2 se cargó también
+en la base local de trabajo el 14/10/2026, con backup previo y sin borrar registros.
 
 ## Ejecutar en Windows
 
-Requiere Python 3.11 o superior. Probado con Python 3.13.3. Desde la raíz del repositorio:
+Requiere Python 3.11 o superior. Correcciones probadas con Python 3.13.14. Desde la raíz del repositorio:
 
 ```powershell
-cd tp3
+cd tp_final
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
 .\.venv\Scripts\python.exe run.py
@@ -38,8 +57,18 @@ usa el Swagger UI por CDN que proporciona FastAPI.
 .\.venv\Scripts\python.exe -m scripts.seed_demo
 ```
 
-Carga 3 muestras y 12 ensayos **sintéticos**, solo en modo local y si no existen
-muestras. No carga datos automáticamente al iniciar. La base está en `data/lab.db`.
+Carga los chips **A0, A1 y A2**, con **12 hilos, 36 pasos y 9 evidencias CSV
+sintéticas**: ancho de banda y ganancia en Tx, ruido en Rx y consumo en PLL.
+Hay **4 hilos aprobados, 4 fallidos y 4 en progreso**, con etapas de preparación,
+medición y revisión. Ver [distribución por chip](docs/demo-data.md).
+
+Solo se permite en modo local de desarrollo. Se puede ejecutar con muestras
+existentes: agrega la campaña sin modificarlas. Repetir el comando conserva las
+ediciones y no duplica la demo; si se eliminan sus muestras, tampoco las recrea.
+El marcador de carga queda en auditoría y cada alta se audita en una transacción.
+No carga datos automáticamente al iniciar. Usa `DATABASE_PATH` o `data/lab.db`
+por defecto. Recargar la página y abrir los indicadores para explorar los hilos.
+Los valores y resultados son ejemplos, no criterios eléctricos reales.
 
 ### Autenticación
 
@@ -56,15 +85,34 @@ pueden crear, borrar y consultar la auditoría. La cuenta de Auth0 no está incl
 
 1. Registrar una muestra con número de parte y placa. El servidor asigna su ID.
 2. Seleccionar la muestra y la macro Tx, Rx o PLL.
-3. Registrar métrica, valor, unidad y dictamen. Las fechas son opcionales.
-4. Filtrar aprobados/fallidos y exportar **la vista actual** a CSV.
-5. Consultar la bitácora. Eliminar un chip borra sus ensayos en cascada y conserva
-   una copia en auditoría, dentro de la misma transacción.
+3. Crear un hilo con título y objetivo; comienza **En progreso**.
+4. Abrirlo y agregar pasos: título, notas, estado y, si corresponde, métrica/valor/unidad.
+5. En cada paso, usar **Adjuntar evidencia** para subir un archivo o guardar un enlace.
+6. Usar **Editar paso** para actualizar notas, medición o estado. La auditoría conserva
+   el antes y el después. Los pasos se muestran en orden de creación.
+7. Filtrar hilos por estado, exportar **la lista actual de hilos** a CSV, o entrar a
+   los listados globales haciendo clic en cualquiera de los cinco indicadores.
+8. Consultar la bitácora. Eliminar un chip, hilo o paso elimina en cascada sus
+   descendientes. La auditoría conserva datos y metadatos, **no los archivos binarios**.
 
-El buscador filtra por parte o placa. Las métricas superiores resumen todo el
-laboratorio, independientemente de la muestra o filtro. Las fechas de ensayos
-se almacenan en UTC y se muestran en hora local. `passed` es el dictamen del operador:
-el sistema no deduce si una magnitud eléctrica cumple especificación.
+El buscador filtra por parte o placa. Los indicadores resumen todo el laboratorio;
+cada hilo cuenta una vez, aunque contenga muchos pasos. **Ensayos realizados** es
+el total de hilos, incluidos los que siguen en progreso.
+
+El estado del hilo se deriva de sus pasos: **Fallido** si alguno falla; en ausencia
+de fallos, **En progreso** si no tiene pasos o queda alguno en progreso; **Aprobado**
+si todos están aprobados. El operador decide el estado de cada paso; la aplicación
+no inventa límites eléctricos. Las fechas se guardan en UTC y se muestran en hora local.
+
+### Archivos y enlaces
+
+Hasta **10 MiB por archivo** y **20 evidencias por paso** (archivos y enlaces juntos).
+Se admiten PDF, PPT/PPTX, DOC/DOCX, XLS/XLSX, TXT/CSV, PNG/JPG/JPEG/WEBP/GIF.
+Los enlaces deben ser HTTP o HTTPS, sin credenciales embebidas; no se descargan
+automáticamente. Los archivos quedan dentro de SQLite, por lo que el backup los incluye.
+Se descargan autenticados, conservando su nombre, mediante descarga forzada; no hay
+ejecución, previsualización de documentos ni análisis antivirus del contenido.
+Los lectores pueden consultar/descargar; solo los operadores pueden cargar o eliminar.
 
 ## Arquitectura y contrato
 
@@ -86,14 +134,39 @@ consume los endpoints originales, sin agregarles `/api`.
 | POST | `/logout` | 200 | Cerrar sesión y obtener URL de salida |
 | GET | `/health` | 200 | Comprobar acceso a la base, público |
 
-Errores JSON: `{"error":"mensaje"}`. `400` entrada inválida, `401` sesión ausente,
-`403` permiso/CSRF, `404` recurso o relación inexistente, `503` base no disponible.
-Las escrituras requieren cookie y header `X-CSRF-Token` obtenido de `/session`,
-incluso en modo local. Los IDs y macros viajan en el path, nunca en el body de alta.
-No se admiten campos extra, strings vacíos, valores no finitos ni timestamps sin zona.
-Omitir las fechas desconocidas en lugar de enviar `null`.
+### API de hilos (versión 2.0.0)
 
-[openapi.yaml](openapi.yaml) es el contrato canónico 1.1.0 servido en `/openapi.json`,
+Usar `B = /chips/{chipId}/macros/{macro}/threads` para la siguiente tabla:
+
+| Método | Ruta | Uso |
+|---|---|---|
+| GET | `/threads?status=in_progress` | Listado global y filtros `in_progress`, `passed`, `failed` |
+| GET / POST | `B` | Listar / crear hilos de la muestra y macro |
+| GET / DELETE | `B/{threadId}` | Detalle con pasos y evidencias / eliminar hilo |
+| POST | `B/{threadId}/steps` | Agregar un paso |
+| PUT / DELETE | `B/{threadId}/steps/{stepId}` | Reemplazar datos del paso / eliminarlo |
+| POST | `B/{threadId}/steps/{stepId}/attachments/links` | Agregar nombre y URL |
+| POST | `B/{threadId}/steps/{stepId}/attachments/files` | Subir binario y header `X-Filename` codificado como URL |
+| GET | `B/{threadId}/steps/{stepId}/attachments/{attachmentId}/download` | Descargar archivo |
+| DELETE | `B/{threadId}/steps/{stepId}/attachments/{attachmentId}` | Eliminar evidencia |
+
+Los POST devuelven 201, las lecturas y PUT 200 y los DELETE 204.
+`/summary.tests` cuenta hilos y se cumple `tests = in_progress + passed + failed`.
+Los endpoints `/tests` se conservan como API histórica y están marcados deprecated:
+sus altas crean un hilo de un paso, pero las mediciones originales archivadas no
+se sobrescriben al editar pasos. El frontend usa exclusivamente `/threads`.
+
+Errores JSON: `{"error":"mensaje"}`. `400` entrada inválida, `401` sesión ausente,
+`403` permiso/CSRF, `404` recurso o relación inexistente, `413` archivo demasiado grande,
+`503` base no disponible.
+Las escrituras (POST, PUT, DELETE) requieren cookie y header `X-CSRF-Token` obtenido
+de `/session`, incluso en modo local. Los IDs y macros viajan en el path.
+No se admiten campos extra, strings vacíos, valores no finitos ni timestamps sin zona.
+En la API histórica se omiten las fechas desconocidas. En los pasos, los campos
+de medición opcionales admiten null; métrica, valor y unidad se completan juntos.
+PUT reemplaza los datos editables de un paso y no modifica sus evidencias.
+
+[openapi.yaml](openapi.yaml) es el contrato canónico 2.0.0 servido en `/openapi.json`,
 `/openapi.yaml` y `/docs`. [opeanapi.yaml](opeanapi.yaml), con la grafía original,
 se conserva intacto como antecedente 1.0.0. El generador
 `python -m scripts.build_contract` aplica las extensiones documentadas al original.
@@ -111,12 +184,16 @@ Invoke-RestMethod $url -Method Post -WebSession $lab -Headers $headers -ContentT
 Invoke-RestMethod "${url}?passed=true" -WebSession $lab
 ```
 
+El ejemplo anterior ilustra la API histórica del TP2; el alta genera automáticamente
+un hilo de un paso. Para el flujo actual, usar la interfaz o los endpoints de hilos
+documentados en `/docs`.
+
 ## Estructura
 
 ```text
-tp3/
-├── backend/             configuración, auth, schemas, SQLite, rutas y aplicación
-├── frontend/            interfaz y módulos api/ui/app sin build
+tp_final/
+├── backend/             auth, SQLite, migraciones, hilos, pasos, evidencias y rutas históricas
+├── frontend/            interfaz y módulos api/ui/app/thread-view sin build
 ├── tests/               contrato, API, seguridad, concurrencia y operación
 ├── scripts/             seed, backup, contrato y prueba de navegador
 ├── docs/                especificación, plan, decisiones, operación y defensa
@@ -129,7 +206,7 @@ tp3/
 ```
 
 La referencia `tp-referencia/` se conserva sin modificar y no forma parte del servidor.
-El workflow de GitHub Actions está en `../.github/workflows/tp3-ci.yml`.
+La ejecución remota de CI no se verificó en esta corrección.
 
 ## Verificar
 
@@ -142,7 +219,7 @@ El workflow de GitHub Actions está en `../.github/workflows/tp3-ci.yml`.
 
 La última prueba usa Chrome instalado, una base temporal y un servidor propio en un
 puerto libre. No usa `.env` ni toca datos del laboratorio. Genera capturas en
-`artifacts/desktop.png` y `artifacts/mobile.png`. Si no hay Chrome:
+`artifacts/threads-v2/desktop.png` y `artifacts/threads-v2/mobile.png`. Si no hay Chrome:
 
 ```powershell
 .\.venv\Scripts\python.exe -m playwright install chromium
@@ -188,12 +265,13 @@ La defensa requiere que el alumno revise y pueda explicar las decisiones.
 - [Trazabilidad con la materia y guion de defensa](docs/defense.md).
 - [Verificación y límites](docs/verification.md).
 - [Mejoras priorizadas](docs/roadmap.md).
+- [Diseño y aceptación de las correcciones de hilos](docs/changes-2026-10-13.md).
 
 ## Alcance pendiente externo
 
 Se implementó y verificó localmente la aplicación. Falta configurar y probar el
 tenant real de Auth0, publicar el repositorio y ejecutar su CI, y desplegar si se
-requiere acceso remoto. La carpeta solicitada es `tp3`; algunos apuntes indican
+requiere acceso remoto. La carpeta actual es `tp_final`; algunos apuntes indican
 `tp-final` y contienen criterios administrativos contradictorios entre semanas.
 Confirmar formato de entrega e integrantes con la cátedra. No se afirma que haya
 una rúbrica formal completa en los archivos disponibles.

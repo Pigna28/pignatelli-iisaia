@@ -1,5 +1,10 @@
 # Complementos y evolución priorizada
 
+Actualización 13/10/2026: ya se implementaron hilos con pasos, En progreso amarillo,
+cinco listados globales navegables, evidencias por paso (documentos, presentaciones,
+imágenes y enlaces) y migración v1→v2. Queda como evolución el análisis antivirus,
+la previsualización de documentos y el almacenamiento de objetos para grandes volúmenes.
+
 ## Ya incorporados
 
 Interfaz adaptable, búsqueda, filtros, contadores, CSV con escape de fórmulas,
@@ -35,7 +40,7 @@ navegador, CI preparado y contexto/documentación para nuevas sesiones.
 
 PostgreSQL y migraciones incrementales, separación por laboratorio con autorización
 por recurso, importación CSV con vista previa y reporte de errores, adquisición
-SCPI/PyVISA en un servicio separado, adjuntos de curvas y certificados, límites
+SCPI/PyVISA en un servicio separado, análisis de curvas y certificados adjuntos, límites
 versionados y alertas, métricas operativas y pruebas de carga.
 
 Un MCP propio tendría sentido si se necesitan consultas recurrentes del agente

@@ -17,7 +17,13 @@ def test_complete_flow_and_cascade(client, chip, measurement, settings):
         result = client.post(path(chip, macro), json=measurement)
         assert result.status_code == 201
         assert result.json()["macro"] == macro
-    assert client.get("/summary").json() == {"chips": 1, "tests": 3, "passed": 3, "failed": 0}
+    assert client.get("/summary").json() == {
+        "chips": 1,
+        "tests": 3,
+        "passed": 3,
+        "failed": 0,
+        "in_progress": 0,
+    }
     assert client.delete(f"/chips/{chip['id']}").status_code == 204
     assert client.get("/chips").json() == []
     assert client.get(path(chip)).status_code == 404

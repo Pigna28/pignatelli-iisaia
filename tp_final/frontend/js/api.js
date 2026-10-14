@@ -2,13 +2,15 @@ let csrf = "";
 export function setCSRF(value) { csrf = value; }
 
 export async function api(path, {method = "GET", body} = {}) {
+  const file = body instanceof File;
   let response;
   try {
     response = await fetch(path, {
       method, credentials: "same-origin",
-      headers: {"Accept": "application/json", ...(body ? {"Content-Type": "application/json"} : {}),
+      headers: {"Accept": "application/json", ...(body ? {"Content-Type": file ? "application/octet-stream" : "application/json"} : {}),
+        ...(file ? {"X-Filename": encodeURIComponent(body.name)} : {}),
         ...(method !== "GET" ? {"X-CSRF-Token": csrf} : {})},
-      ...(body ? {body: JSON.stringify(body)} : {}),
+      ...(body ? {body: file ? body : JSON.stringify(body)} : {}),
     });
   } catch { throw new Error("No se pudo conectar con el servidor. Verificá la conexión y reintentá."); }
   if (response.status === 401) {
@@ -22,7 +24,7 @@ export async function api(path, {method = "GET", body} = {}) {
 }
 
 export function csv(rows) {
-  const columns = ["id", "chip_id", "macro", "metric", "measured_value", "unit", "passed", "measured_at"];
+  const columns = ["id", "chip_id", "part_number", "board", "macro", "title", "status", "step_count", "created_at"];
   const escape = value => {
     let text = String(value ?? "");
     // Evitar fórmulas al abrir texto no confiable en una planilla.

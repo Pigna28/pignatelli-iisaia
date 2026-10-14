@@ -4,196 +4,103 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>IC Bring-up Lab · Caracterización</title>
+  <title>IC Bring-up Lab · Hilos de ensayo</title>
   <link rel="stylesheet" href="/assets/css/styles.css">
-  <script type="module" src="/assets/js/app.js">
-</script>
+  <link rel="stylesheet" href="/assets/css/threads.css">
+  <script type="module" src="/assets/js/app.js"></script>
 </head>
 <body>
   <a class="skip" href="#workspace">Saltar al laboratorio</a>
   <header class="topbar">
-    <a class="brand" href="/" aria-label="IC Bring-up Lab inicio">
-<span class="chip-icon">IC</span>
-<span>BRING-UP <b>LAB</b>
-<small>REGISTRO DE CARACTERIZACIÓN</small>
-</span>
-</a>
-    <nav aria-label="Principal">
-<a href="/docs" target="_blank" rel="noopener">API ↗</a>
-<span id="identity">Conectando…</span>
-<button id="logout" class="quiet" disabled>Salir</button>
-</nav>
+    <a class="brand" href="/" aria-label="IC Bring-up Lab inicio"><span class="chip-icon">IC</span><span>BRING-UP <b>LAB</b><small>REGISTRO DE CARACTERIZACIÓN</small></span></a>
+    <nav aria-label="Principal"><a href="/docs" target="_blank" rel="noopener">API ↗</a><span id="identity">Conectando…</span><button id="logout" class="quiet" disabled>Salir</button></nav>
   </header>
   <main>
     <section class="intro">
-<div>
-<p class="eyebrow">INGENIERÍA DE SILICIO / LABORATORIO</p>
-<h1>De la muestra<br>al resultado.</h1>
-<p>Chips, macros y mediciones. Una bitácora para cada ensayo.</p>
-</div>
-<div class="status">
-<span class="dot">
-</span>
-<span id="mode">Conectando con el laboratorio</span>
-</div>
-</section>
-    <div id="notice" role="status" aria-live="polite" hidden>
-</div>
+      <div><p class="eyebrow">INGENIERÍA DE SILICIO / LABORATORIO</p><h1>De la muestra<br>al resultado.</h1><p>Seguí cada ensayo, paso a paso. Conservá sus resultados y evidencias.</p></div>
+      <div class="status"><span class="dot"></span><span id="mode">Conectando con el laboratorio</span></div>
+    </section>
+    <div id="notice" role="status" aria-live="polite" hidden></div>
     <section class="stats" aria-label="Resumen del laboratorio">
-      <article>
-<span>Muestras registradas</span>
-<strong id="stat-chips">—</strong>
-<small>Inventario de chips</small>
-</article>
-      <article>
-<span>Ensayos realizados</span>
-<strong id="stat-tests">—</strong>
-<small>Las tres macros</small>
-</article>
-      <article>
-<span>Aprobados</span>
-<strong id="stat-passed" class="success">—</strong>
-<small>Dictamen del operador</small>
-</article>
-      <article>
-<span>Fallidos</span>
-<strong id="stat-failed" class="danger-text">—</strong>
-<small>Requieren revisión</small>
-</article>
+      <button class="stat-card" data-overview="chips" aria-pressed="false" aria-controls="overview"><span>Muestras registradas</span><strong id="stat-chips">—</strong><small>Ver todas las muestras ↗</small></button>
+      <button class="stat-card" data-overview="tests" aria-pressed="false" aria-controls="overview"><span>Ensayos realizados</span><strong id="stat-tests">—</strong><small>Ver todos los hilos ↗</small></button>
+      <button class="stat-card progress-card" data-overview="in_progress" aria-pressed="false" aria-controls="overview"><span>En progreso</span><strong id="stat-in_progress">—</strong><small>Ver ensayos en curso ↗</small></button>
+      <button class="stat-card" data-overview="passed" aria-pressed="false" aria-controls="overview"><span>Aprobados</span><strong id="stat-passed" class="success">—</strong><small>Ver ensayos aprobados ↗</small></button>
+      <button class="stat-card" data-overview="failed" aria-pressed="false" aria-controls="overview"><span>Fallidos</span><strong id="stat-failed" class="danger-text">—</strong><small>Ver ensayos fallidos ↗</small></button>
+    </section>
+    <section id="overview" class="panel overview" aria-labelledby="overview-title" hidden>
+      <div class="section-heading"><div><p class="eyebrow">VISTA GLOBAL DEL LABORATORIO</p><h2 id="overview-title" tabindex="-1">Todos los registros</h2></div><button id="close-overview" class="quiet">Cerrar listado</button></div>
+      <p class="muted">Seleccioná un registro para abrir su muestra o el hilo completo.</p>
+      <div id="overview-list" class="overview-list" aria-live="polite"></div>
     </section>
     <section id="workspace" class="workspace" aria-label="Laboratorio">
       <aside class="panel samples">
-        <div class="section-heading">
-<h2>Muestras</h2>
-<button id="new-chip" class="primary" disabled>+ Nueva</button>
-</div>
+        <div class="section-heading"><h2>Muestras</h2><button id="new-chip" class="primary" disabled>+ Nueva</button></div>
         <label class="search-label" for="search">Buscar por parte o placa</label>
         <input id="search" type="search" placeholder="Ej. CHIP001 o EVK-1" autocomplete="off">
-        <div id="chip-list" aria-label="Muestras disponibles" aria-busy="true">
-<p class="empty">Cargando muestras…</p>
-</div>
+        <div id="chip-list" aria-label="Muestras disponibles" aria-busy="true"><p class="empty">Cargando muestras…</p></div>
         <button id="refresh" class="quiet full">Actualizar datos</button>
       </aside>
       <section class="panel results" aria-label="Detalle de la muestra">
-        <div class="section-heading">
-<div>
-<p class="eyebrow">MUESTRA SELECCIONADA</p>
-<h2 id="chip-title">Seleccioná una muestra</h2>
-<p id="chip-meta" class="muted">Registrá una muestra para comenzar.</p>
-</div>
-<button id="delete-chip" class="danger" disabled>Eliminar muestra</button>
-</div>
+        <div class="section-heading"><div><p class="eyebrow">MUESTRA SELECCIONADA</p><h2 id="chip-title" tabindex="-1">Seleccioná una muestra</h2><p id="chip-meta" class="muted">Registrá una muestra para comenzar.</p></div><button id="delete-chip" class="danger" disabled>Eliminar muestra</button></div>
         <div class="macros" role="group" aria-label="Macro del chip">
-<button data-macro="Tx" aria-pressed="true">Tx <small>Transmisor</small>
-</button>
-<button data-macro="Rx" aria-pressed="false">Rx <small>Receptor</small>
-</button>
-<button data-macro="PLL" aria-pressed="false">PLL <small>Síntesis de frecuencia</small>
-</button>
-</div>
-        <div class="toolbar">
-<label>Resultado <select id="filter">
-<option value="">Todos</option>
-<option value="true">Aprobados</option>
-<option value="false">Fallidos</option>
-</select>
-</label>
-<div>
-<button id="export" class="quiet" disabled>Exportar CSV</button>
-<button id="new-test" class="primary" disabled>+ Registrar ensayo</button>
-</div>
-</div>
-        <div class="table-wrap">
-<table>
-<caption id="table-caption">Ensayos de la macro Tx</caption>
-<thead>
-<tr>
-<th>Métrica</th>
-<th>Valor</th>
-<th>Resultado</th>
-<th>Medición</th>
-<th>Acciones</th>
-</tr>
-</thead>
-<tbody id="test-list">
-<tr>
-<td colspan="5" class="empty">Elegí una muestra del inventario.</td>
-</tr>
-</tbody>
-</table>
-</div>
+          <button data-macro="Tx" aria-pressed="true">Tx <small>Transmisor</small></button>
+          <button data-macro="Rx" aria-pressed="false">Rx <small>Receptor</small></button>
+          <button data-macro="PLL" aria-pressed="false">PLL <small>Síntesis de frecuencia</small></button>
+        </div>
+        <div class="toolbar"><label>Estado <select id="filter"><option value="">Todos</option><option value="in_progress">En progreso</option><option value="passed">Aprobados</option><option value="failed">Fallidos</option></select></label><div><button id="export" class="quiet" disabled>Exportar CSV</button><button id="new-thread" class="primary" disabled>+ Nuevo hilo</button></div></div>
+        <div class="table-wrap"><table><caption id="table-caption">Hilos de ensayo de la macro Tx</caption><thead><tr><th>Hilo de ensayo</th><th>Estado</th><th>Pasos</th><th>Creado</th><th>Acciones</th></tr></thead><tbody id="test-list"><tr><td colspan="5" class="empty">Elegí una muestra del inventario.</td></tr></tbody></table></div>
         <p id="result-count" class="table-foot">Sin muestra seleccionada</p>
       </section>
     </section>
-    <details id="audit-panel" class="panel audit" hidden>
-<summary>Bitácora de operaciones</summary>
-<p class="muted">Últimas 20 altas y bajas. Las bajas conservan una copia del recurso en auditoría.</p>
-<button id="refresh-audit" class="quiet">Actualizar bitácora</button>
-<ol id="audit-list">
-</ol>
-</details>
-    <footer>
-<span>IC Bring-up Lab · TP3</span>
-<span>Tx / Rx / PLL · Trazabilidad de laboratorio</span>
-<a href="/openapi.yaml">Contrato OpenAPI</a>
-</footer>
+    <section id="thread-detail" class="panel thread-detail" aria-labelledby="thread-title" hidden>
+      <div class="section-heading"><div><p class="eyebrow">HILO DE PRUEBAS / SECUENCIA DE PASOS</p><h2 id="thread-title" tabindex="-1"></h2></div><button id="close-thread" class="quiet">Cerrar hilo</button></div>
+      <div id="thread-meta" class="thread-meta"></div><p id="thread-description" class="step-notes"></p>
+      <p class="muted">Un paso fallido marca el hilo como fallido. Sin fallos, queda en progreso mientras tenga pasos pendientes; todos aprobados completan el hilo.</p>
+      <button id="add-step" class="primary" disabled>+ Agregar paso</button>
+      <div id="step-list" class="timeline" aria-live="polite"></div>
+    </section>
+    <details id="audit-panel" class="panel audit" hidden><summary>Bitácora de operaciones</summary><p class="muted">Últimas 20 altas, actualizaciones y bajas.</p><button id="refresh-audit" class="quiet">Actualizar bitácora</button><ol id="audit-list"></ol></details>
+    <footer><span>IC Bring-up Lab · TP final</span><span>Tx / Rx / PLL · Trazabilidad de laboratorio</span><a href="/openapi.yaml">Contrato OpenAPI</a></footer>
   </main>
   <dialog id="chip-dialog" aria-labelledby="chip-dialog-title">
-<form id="chip-form">
-<h2 id="chip-dialog-title">Registrar muestra</h2>
-<p class="muted">Cada registro representa una muestra física.</p>
-<label>Número de parte<input name="part_number" required maxlength="120" placeholder="CHIP001">
-</label>
-<label>Placa / kit de evaluación<input name="board" required maxlength="120" placeholder="EVK-1">
-</label>
-<label>Fecha de ensamblado (opcional)<input name="assembled_at" type="date">
-</label>
-<p class="form-error" role="alert">
-</p>
-<div class="dialog-actions">
-<button type="button" data-close class="quiet">Cancelar</button>
-<button type="submit" class="primary">Guardar muestra</button>
-</div>
-</form>
-</dialog>
-  <dialog id="test-dialog" aria-labelledby="test-dialog-title">
-<form id="test-form">
-<h2 id="test-dialog-title">Registrar ensayo</h2>
-<p id="test-context" class="muted">
-</p>
-<label>Métrica<input name="metric" required maxlength="120" placeholder="gain">
-</label>
-<div class="form-grid">
-<label>Valor medido<input name="measured_value" type="number" step="any" required placeholder="12.5">
-</label>
-<label>Unidad<input name="unit" required maxlength="120" placeholder="dB">
-</label>
-</div>
-<label>Resultado<select name="passed">
-<option value="true">Aprobado</option>
-<option value="false">Fallido</option>
-</select>
-</label>
-<label>Fecha y hora local (opcional)<input name="measured_at" type="datetime-local" step="1">
-</label>
-<p class="muted">La fecha se convierte a UTC. El resultado lo determina el operador.</p>
-<p class="form-error" role="alert">
-</p>
-<div class="dialog-actions">
-<button type="button" data-close class="quiet">Cancelar</button>
-<button type="submit" class="primary">Guardar ensayo</button>
-</div>
-</form>
-</dialog>
-  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
-<h2 id="confirm-title">Confirmar eliminación</h2>
-<p id="confirm-message">
-</p>
-<p class="muted">La acción no se puede deshacer desde la interfaz.</p>
-<div class="dialog-actions">
-<button id="cancel-delete" class="quiet">Cancelar</button>
-<button id="confirm-delete" class="danger">Eliminar definitivamente</button>
-</div>
-</dialog>
+    <form id="chip-form"><h2 id="chip-dialog-title">Registrar muestra</h2><p class="muted">Cada registro representa una muestra física.</p>
+      <label>Número de parte<input name="part_number" required maxlength="120" placeholder="CHIP001"></label>
+      <label>Placa / kit de evaluación<input name="board" required maxlength="120" placeholder="EVK-1"></label>
+      <label>Fecha de ensamblado (opcional)<input name="assembled_at" type="date"></label>
+      <p class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" data-close class="quiet">Cancelar</button><button type="submit" class="primary">Guardar muestra</button></div>
+    </form>
+  </dialog>
+  <dialog id="thread-dialog" aria-labelledby="thread-dialog-title">
+    <form id="thread-form"><h2 id="thread-dialog-title">Nuevo hilo de ensayo</h2><p id="thread-context" class="muted"></p>
+      <label>Título del hilo<input name="title" required maxlength="120" placeholder="Caracterización de ganancia a 25 °C"></label>
+      <label>Objetivo / descripción<textarea name="description" maxlength="10000" rows="4"></textarea></label>
+      <p class="muted">El hilo comienza en progreso. Luego podrás agregar pasos y sus evidencias.</p>
+      <p class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" data-close class="quiet">Cancelar</button><button type="submit" class="primary">Crear hilo</button></div>
+    </form>
+  </dialog>
+  <dialog id="step-dialog" aria-labelledby="step-dialog-title">
+    <form id="step-form"><h2 id="step-dialog-title">Agregar paso al hilo</h2>
+      <label>Título del paso<input name="title" required maxlength="120" placeholder="Configurar alimentación y medir consumo"></label>
+      <label>Notas del paso<textarea name="notes" rows="3" maxlength="10000"></textarea></label>
+      <label>Estado del paso<select name="status"><option value="in_progress">En progreso</option><option value="passed">Aprobado</option><option value="failed">Fallido</option></select></label>
+      <fieldset><legend>Medición opcional</legend><label>Métrica<input name="metric" maxlength="120" placeholder="gain"></label>
+        <div class="form-grid"><label>Valor medido<input name="measured_value" type="number" step="any"></label><label>Unidad<input name="unit" maxlength="120" placeholder="dB"></label></div>
+        <label>Fecha y hora local<input name="measured_at" type="datetime-local" step="1"></label>
+      </fieldset><p class="muted">Si cargás una medición, completá métrica, valor y unidad. Los archivos se adjuntan después de guardar el paso.</p>
+      <p class="form-error" role="alert"></p><div class="dialog-actions"><button type="button" data-close class="quiet">Cancelar</button><button type="submit" class="primary">Guardar paso</button></div>
+    </form>
+  </dialog>
+  <dialog id="evidence-dialog" aria-labelledby="evidence-title">
+    <h2 id="evidence-title">Adjuntar evidencia</h2><p id="evidence-context" class="muted"></p>
+    <form id="file-form"><label>Archivo del paso<input name="file" type="file" required accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.txt,.csv,.png,.jpg,.jpeg,.webp,.gif"></label>
+      <p class="muted">PDF, presentaciones, documentos, planillas o imágenes. Hasta 10 MiB por archivo y 20 evidencias por paso.</p>
+      <p class="form-error" role="alert"></p><button type="submit" class="primary">Subir archivo</button>
+    </form>
+    <form id="link-form"><h3>O agregar un enlace</h3><label>Nombre del enlace<input name="name" required maxlength="120" placeholder="Presentación de resultados"></label><label>URL del enlace<input name="url" type="url" required maxlength="2048" placeholder="https://..."></label>
+      <p class="form-error" role="alert"></p><button type="submit" class="primary">Guardar enlace</button>
+    </form><div class="dialog-actions"><button type="button" data-close class="quiet">Cerrar</button></div>
+  </dialog>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title">Confirmar eliminación</h2><p id="confirm-message"></p><p class="muted">La acción no se puede deshacer desde la interfaz.</p><div class="dialog-actions"><button id="cancel-delete" class="quiet">Cancelar</button><button id="confirm-delete" class="danger">Eliminar definitivamente</button></div></dialog>
 </body>
 </html>

@@ -47,3 +47,40 @@ def test_responses_match_contract(client, chip, measurement):
             {**schema, "components": spec["components"]}, format_checker=FormatChecker()
         )
         validator.validate(response.json())
+
+
+def test_thread_responses_match_contract(client, chip):
+    spec = client.get("/openapi.json").json()
+    base = f"/chips/{chip['id']}/macros/Tx/threads"
+    created = client.post(base, json={"title": "Contract thread"})
+    path = base + "/" + str(created.json()["id"])
+    step = client.post(path + "/steps", json={"title": "First step"})
+    step_path = path + "/steps/" + str(step.json()["id"])
+    link = client.post(
+        step_path + "/attachments/links", json={"name": "Reference", "url": "https://example.org"}
+    )
+    file = client.post(
+        step_path + "/attachments/files", content=b"hello", headers={"X-Filename": "data.txt"}
+    )
+    template = "/chips/{chipId}/macros/{macro}/threads"
+    cases = [
+        (template, "post", created),
+        (template, "get", client.get(base)),
+        ("/threads", "get", client.get("/threads")),
+        (template + "/{threadId}", "get", client.get(path)),
+        (template + "/{threadId}/steps", "post", step),
+        (
+            template + "/{threadId}/steps/{stepId}",
+            "put",
+            client.put(step_path, json={"title": "Updated", "status": "passed"}),
+        ),
+        (template + "/{threadId}/steps/{stepId}/attachments/links", "post", link),
+        (template + "/{threadId}/steps/{stepId}/attachments/files", "post", file),
+    ]
+    for route, method, response in cases:
+        schema = spec["paths"][route][method]["responses"][str(response.status_code)]["content"][
+            "application/json"
+        ]["schema"]
+        Draft202012Validator(
+            {**schema, "components": spec["components"]}, format_checker=FormatChecker()
+        ).validate(response.json())

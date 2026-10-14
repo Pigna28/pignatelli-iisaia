@@ -1,5 +1,35 @@
 # Arquitectura y decisiones
 
+## Extensión 2.0.0 — 13/10/2026
+
+El flujo vigente es `chips → threads → steps → attachments`, con FK y borrado en
+cascada. `tests` se conserva como archivo/API de mediciones históricas. La migración
+v1→v2 es transaccional y repetible: cada medición anterior genera un hilo y un paso.
+Un trigger convierte nuevas altas en la API histórica del mismo modo.
+
+`thread_overview` deriva el estado desde los pasos; no hay un contador o estado
+duplicado que pueda quedar desincronizado. Fallido tiene prioridad; sin fallos,
+un hilo vacío o con pasos pendientes está en progreso; todos aprobados lo completan.
+`/summary` y los listados globales consultan esa misma vista.
+
+`thread-view.js` encapsula la secuencia y los formularios; `app.js` coordina muestras,
+indicadores y listados. Las respuestas tardías se descartan por revisión de carga.
+PUT reemplaza datos de un paso con auditoría antes/después. Las evidencias se agregan
+por separado para que un fallo de carga no duplique un paso ya guardado.
+
+Los archivos (máximo 10 MiB) se almacenan como BLOB SQLite junto a metadatos; esto
+mantiene atomicidad, cascada y backups en un solo archivo. La carga usa body binario
+y `X-Filename` codificado, sin dependencias multipart adicionales. Los nombres no
+se usan como rutas. Las descargas requieren sesión y se fuerzan como attachment.
+El límite por paso es 20 evidencias; los enlaces son HT../pignatelli-iisaia/tp_final/HTTPS sin fetch del servidor.
+No hay antivirus ni validación interna de los formatos; para gran volumen conviene
+almacenamiento de objetos y análisis de contenido.
+
+La auditoría de bajas conserva metadatos y notas, no los bytes de archivos borrados.
+Los registros `tests` originales no reflejan cambios posteriores en pasos: son
+antecedentes, y su API está marcada deprecated. El resto de este documento describe
+las decisiones fundacionales de la versión 1.1.0, conservadas como antecedente.
+
 ## Componentes
 
 ```mermaid

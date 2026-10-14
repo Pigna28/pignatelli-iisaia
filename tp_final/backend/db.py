@@ -5,6 +5,8 @@ import sqlite3
 from contextlib import contextmanager
 from datetime import datetime, timezone
 
+from .migrations import migrate_v2
+
 SCHEMA = """
 BEGIN IMMEDIATE;
 CREATE TABLE chips (
@@ -59,7 +61,10 @@ def initialize(path):
         version = db.execute("PRAGMA user_version").fetchone()[0]
         if version == 0:
             db.executescript(SCHEMA)
-        elif version != 1:
+            version = 1
+        if version == 1:
+            migrate_v2(db)
+        elif version != 2:
             raise RuntimeError(f"Versión de base no soportada: {version}")
 
 

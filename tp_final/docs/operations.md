@@ -2,8 +2,8 @@
 
 ## Configuración
 
-`.env` se carga desde la raíz de `tp3`, sin reemplazar variables ya presentes en el
-proceso. `DATABASE_PATH` relativo se resuelve contra `tp3`, no contra el directorio
+`.env` se carga desde la raíz de `tp_final`, sin reemplazar variables ya presentes en el
+proceso. `DATABASE_PATH` relativo se resuelve contra `tp_final`, no contra el directorio
 actual de la terminal. `BASE_URL` define origen, callback y host permitido.
 No incluye path, credenciales ni query. En desarrollo el servidor local usa el
 puerto de BASE_URL o 8000.
@@ -22,7 +22,7 @@ puerto de BASE_URL o 8000.
 
 ## Backup y restauración
 
-Desde `tp3`, con el Python de su entorno:
+Desde `tp_final`, con el Python de su entorno:
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.backup data/backups/lab-2026-09-30.db
@@ -47,10 +47,14 @@ archivos `-wal` y `-shm`. No editar ni borrar esos archivos con el proceso activ
 
 ## Esquema y migraciones
 
-El esquema inicial usa `PRAGMA user_version=1`. El arranque crea tablas solamente
-si la versión es cero y rechaza versiones desconocidas. No hay migraciones de
-versiones posteriores todavía. Para un cambio de esquema: backup, migración
-transaccional versionada y pruebas con una copia del esquema anterior.
+El esquema vigente usa `PRAGMA user_version=2`. El arranque crea el esquema inicial
+si la versión es cero y migra v1→v2 para agregar hilos, pasos y archivos. Cada
+medición histórica conserva sus valores en un hilo de un paso. La migración es
+transaccional: ante error revierte las tablas nuevas y conserva la versión anterior.
+Versiones desconocidas se rechazan. Hacer un backup antes de actualizar una base real.
+Los archivos subidos son BLOB en SQLite y quedan incluidos en el backup normal.
+Al eliminar una evidencia se borran sus bytes; la auditoría solo conserva metadatos.
+Para futuros cambios: backup, migración transaccional versionada y prueba con copia.
 Nunca introducir un `DROP TABLE` automático como mecanismo de actualización.
 
 ## Observabilidad

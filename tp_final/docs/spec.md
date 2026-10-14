@@ -34,6 +34,21 @@ Laboratorio compartido: lectores ven todas las muestras; operadores autorizados
 pueden escribir sobre todas. No hay aislamiento multiempresa. `passed` es el
 dictamen del operador; no se inventan umbrales eléctricos. Números de parte pueden
 repetirse porque identifican el diseño y no necesariamente la muestra física.
-No hay edición de resultados: borrar y registrar conserva evidencia de ambas acciones.
+Desde la corrección del 13/10/2026 se permite editar pasos con auditoría antes/después.
+Las mediciones de la API histórica permanecen archivadas sin sobrescribirse.
 No hay adquisición desde instrumentos ni certificación metrológica.
 El login real requiere un tenant y credenciales del titular.
+
+## Extensión vigente: hilos y evidencias
+
+La versión 2.0.0 implementa el pedido del 13/10/2026 en
+[changes-2026-10-13.md](changes-2026-10-13.md): ensayos como hilos, pasos con estado,
+En progreso amarillo, indicadores globales navegables y archivos/enlaces por paso.
+Los contadores ahora cuentan hilos y las mediciones anteriores se migran a hilos
+de un paso. Esta extensión reemplaza el flujo de medición individual de la UI.
+
+## Datos iniciales de demostración
+
+La campaña del 14/10/2026 se especifica en [demo-data.md](demo-data.md): chips
+A0/A1/A2 con cuatro tipos de ensayo, pasos en distintas etapas y evidencias CSV.
+La carga explícita preserva datos existentes, se audita y no se duplica al repetirla.

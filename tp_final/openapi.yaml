@@ -5,7 +5,7 @@ info:
     caracterización ejecutados sobre sus macros (Tx, Rx, PLL) durante el proceso de
     bring-up en laboratorio. Laboratorio compartido. Cookie de sesión en modo Auth0;
     modo local solo en loopback. Antes de escribir, obtener X-CSRF-Token de GET /session.
-  version: 1.1.0
+  version: 2.0.0
 paths:
   /chips:
     get:
@@ -133,8 +133,10 @@ paths:
   /chips/{chipId}/macros/{macro}/tests:
     get:
       summary: Listar ensayos de una macro
-      description: Obtiene los ensayos de caracterización registrados para una macro
-        específica de un chip.
+      description: 'Obtiene los ensayos de caracterización registrados para una macro
+        específica de un chip. API histórica de mediciones: cada alta crea un hilo
+        de un paso. Para el flujo actual usar /threads. Las filas históricas no reflejan
+        ediciones posteriores de pasos.'
       operationId: listTests
       tags:
       - Tests
@@ -186,10 +188,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      deprecated: true
     post:
       summary: Registrar un ensayo en una macro
-      description: Crea un nuevo ensayo de caracterización sobre la macro indicada
-        de un chip.
+      description: 'Crea un nuevo ensayo de caracterización sobre la macro indicada
+        de un chip. API histórica de mediciones: cada alta crea un hilo de un paso.
+        Para el flujo actual usar /threads. Las filas históricas no reflejan ediciones
+        posteriores de pasos.'
       operationId: createTest
       tags:
       - Tests
@@ -240,11 +245,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      deprecated: true
   /chips/{chipId}/macros/{macro}/tests/{testId}:
     delete:
       summary: Eliminar un ensayo
-      description: Elimina un ensayo de caracterización de una macro específica de
-        un chip.
+      description: 'Elimina un ensayo de caracterización de una macro específica de
+        un chip. API histórica de mediciones: cada alta crea un hilo de un paso. Para
+        el flujo actual usar /threads. Las filas históricas no reflejan ediciones
+        posteriores de pasos.'
       operationId: deleteTest
       tags:
       - Tests
@@ -292,6 +300,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      deprecated: true
   /summary:
     get:
       operationId: getSummary
@@ -322,6 +331,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+      description: Contadores globales de hilos. tests = passed + failed + in_progress;
+        cada hilo cuenta una vez, sin importar sus pasos.
   /session:
     get:
       operationId: getSession
@@ -450,6 +461,908 @@ paths:
                 $ref: '#/components/schemas/Error'
         '403':
           description: CSRF inválido.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /threads:
+    get:
+      tags:
+      - Hilos
+      summary: All Threads
+      operationId: listAllThreads
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - in_progress
+            - passed
+            - failed
+            type: string
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Thread'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads:
+    get:
+      tags:
+      - Hilos
+      summary: List Threads
+      operationId: listThreads
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - enum:
+            - in_progress
+            - passed
+            - failed
+            type: string
+          - type: 'null'
+          title: Status
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Thread'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Hilos
+      summary: Create Thread
+      operationId: createThread
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - $ref: '#/components/parameters/CSRF'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadInput'
+      responses:
+        '201':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Thread'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}:
+    get:
+      tags:
+      - Hilos
+      summary: Get Thread
+      operationId: getThread
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadDetail'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - Hilos
+      summary: Delete Thread
+      operationId: deleteThread
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps:
+    post:
+      tags:
+      - Hilos
+      summary: Create Step
+      operationId: createStep
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - $ref: '#/components/parameters/CSRF'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepInput'
+      responses:
+        '201':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Step'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps/{stepId}:
+    put:
+      tags:
+      - Hilos
+      summary: Update Step
+      operationId: updateStep
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - $ref: '#/components/parameters/CSRF'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepInput'
+      responses:
+        '200':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Step'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - Hilos
+      summary: Delete Step
+      operationId: deleteStep
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps/{stepId}/attachments/links:
+    post:
+      tags:
+      - Evidencias
+      summary: Add Link
+      operationId: addLink
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - $ref: '#/components/parameters/CSRF'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LinkInput'
+      responses:
+        '201':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps/{stepId}/attachments/files:
+    post:
+      tags:
+      - Evidencias
+      summary: Upload
+      operationId: uploadEvidence
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - $ref: '#/components/parameters/CSRF'
+      - name: X-Filename
+        in: header
+        required: true
+        schema: &id002
+          type: string
+      responses:
+        '201':
+          description: Operación exitosa.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '413':
+          description: Archivo mayor a 10 MiB.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: 'Cuerpo binario, máximo 10 MiB y 20 evidencias por paso. X-Filename
+        codificado con percent-encoding. Tipos: PDF, PPT/PPTX, DOC/DOCX, XLS/XLSX,
+        TXT/CSV, PNG/JPG/JPEG/WEBP/GIF. Descarga forzada; no se ejecuta ni analiza
+        el contenido.'
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps/{stepId}/attachments/{attachmentId}/download:
+    get:
+      tags:
+      - Evidencias
+      summary: Download
+      operationId: downloadEvidence
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Attachmentid
+      responses:
+        '200':
+          description: Descarga autenticada.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /chips/{chipId}/macros/{macro}/threads/{threadId}/steps/{stepId}/attachments/{attachmentId}:
+    delete:
+      tags:
+      - Evidencias
+      summary: Delete Attachment
+      operationId: deleteEvidence
+      parameters:
+      - name: chipId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Chipid
+      - name: macro
+        in: path
+        required: true
+        schema:
+          enum:
+          - Tx
+          - Rx
+          - PLL
+          type: string
+          title: Macro
+      - name: threadId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Threadid
+      - name: stepId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Stepid
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: integer
+          exclusiveMinimum: 0
+          title: Attachmentid
+      - $ref: '#/components/parameters/CSRF'
+      responses:
+        '204':
+          description: Successful Response
+        '400':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '503':
+          description: Entrada inválida, sesión/permisos, jerarquía o disponibilidad.
           content:
             application/json:
               schema:
@@ -639,6 +1552,7 @@ components:
       - tests
       - passed
       - failed
+      - in_progress
       properties:
         chips:
           type: integer
@@ -650,6 +1564,9 @@ components:
           type: integer
           minimum: 0
         failed:
+          type: integer
+          minimum: 0
+        in_progress:
           type: integer
           minimum: 0
     Session:
@@ -699,16 +1616,308 @@ components:
         action:
           enum:
           - create
+          - update
           - delete
         resource:
           enum:
           - chip
           - test
+          - thread
+          - step
+          - attachment
         resource_id:
           type: integer
         snapshot:
           type: object
           additionalProperties: true
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LinkInput:
+      properties:
+        name:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Name
+        url:
+          type: string
+          maxLength: 2048
+          title: Url
+      additionalProperties: false
+      type: object
+      required:
+      - name
+      - url
+      title: LinkInput
+    StepInput:
+      properties:
+        title:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Title
+        notes:
+          type: string
+          maxLength: 10000
+          title: Notes
+          default: ''
+        status:
+          type: string
+          enum:
+          - in_progress
+          - passed
+          - failed
+          title: Status
+          default: in_progress
+        metric:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Metric
+        measured_value:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Measured Value
+        unit:
+          anyOf:
+          - type: string
+            maxLength: 120
+            minLength: 1
+          - type: 'null'
+          title: Unit
+        measured_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Measured At
+      additionalProperties: false
+      type: object
+      required:
+      - title
+      title: StepInput
+    ThreadInput:
+      properties:
+        title:
+          type: string
+          maxLength: 120
+          minLength: 1
+          title: Title
+        description:
+          type: string
+          maxLength: 10000
+          title: Description
+          default: ''
+      additionalProperties: false
+      type: object
+      required:
+      - title
+      title: ThreadInput
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    Thread:
+      type: object
+      properties:
+        id: &id001
+          type: integer
+          minimum: 1
+        chip_id: *id001
+        macro: &id009
+          enum:
+          - Tx
+          - Rx
+          - PLL
+        title: *id002
+        description: *id002
+        created_at: &id003
+          type: string
+          format: date-time
+        part_number: *id002
+        board: *id002
+        step_count: &id010
+          type: integer
+          minimum: 0
+        status: &id004
+          type: string
+          enum:
+          - in_progress
+          - passed
+          - failed
+      required:
+      - id
+      - chip_id
+      - macro
+      - title
+      - description
+      - created_at
+      - part_number
+      - board
+      - step_count
+      - status
+      additionalProperties: false
+    Attachment:
+      type: object
+      properties:
+        id: *id001
+        step_id: *id001
+        kind:
+          enum:
+          - file
+          - link
+        name: *id002
+        url:
+          type:
+          - string
+          - 'null'
+        size:
+          type: integer
+          minimum: 0
+        created_at: *id003
+      required:
+      - id
+      - step_id
+      - kind
+      - name
+      - url
+      - size
+      - created_at
+      additionalProperties: false
+    Step:
+      type: object
+      properties:
+        id: *id001
+        thread_id: *id001
+        title: *id002
+        notes: *id002
+        status: *id004
+        metric: &id005
+          type:
+          - string
+          - 'null'
+        measured_value: &id006
+          type:
+          - number
+          - 'null'
+        unit: &id007
+          type:
+          - string
+          - 'null'
+        measured_at: &id008
+          type:
+          - string
+          - 'null'
+          format: date-time
+        created_at: *id003
+        updated_at: *id003
+      required:
+      - id
+      - thread_id
+      - title
+      - notes
+      - status
+      - metric
+      - measured_value
+      - unit
+      - measured_at
+      - created_at
+      - updated_at
+      additionalProperties: false
+    StepDetail:
+      type: object
+      properties:
+        id: *id001
+        thread_id: *id001
+        title: *id002
+        notes: *id002
+        status: *id004
+        metric: *id005
+        measured_value: *id006
+        unit: *id007
+        measured_at: *id008
+        created_at: *id003
+        updated_at: *id003
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+      required:
+      - id
+      - thread_id
+      - title
+      - notes
+      - status
+      - metric
+      - measured_value
+      - unit
+      - measured_at
+      - created_at
+      - updated_at
+      - attachments
+      additionalProperties: false
+    ThreadDetail:
+      type: object
+      properties:
+        id: *id001
+        chip_id: *id001
+        macro: *id009
+        title: *id002
+        description: *id002
+        created_at: *id003
+        part_number: *id002
+        board: *id002
+        step_count: *id010
+        status: *id004
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepDetail'
+      required:
+      - id
+      - chip_id
+      - macro
+      - title
+      - description
+      - created_at
+      - part_number
+      - board
+      - step_count
+      - status
+      - steps
+      additionalProperties: false
   securitySchemes:
     SessionCookie:
       type: apiKey
