@@ -1,9 +1,12 @@
 """Carga explícita, atómica y repetible de la campaña sintética A0/A1/A2."""
 
+import argparse
 import csv
 import io
+from dataclasses import replace
+from pathlib import Path
 
-from backend.config import load_settings
+from backend.config import ROOT, load_settings
 from backend.db import audit, connect, initialize
 from backend.thread_store import now
 
@@ -170,5 +173,19 @@ def seed(settings):
     )
 
 
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--database", type=Path, help="Base alternativa; ruta relativa a tp_final")
+    parser.add_argument(
+        "--append", action="store_true", help="Compatibilidad: siempre conserva datos existentes"
+    )
+    args = parser.parse_args()
+    settings = load_settings()
+    if args.database is not None:
+        path = args.database if args.database.is_absolute() else ROOT / args.database
+        settings = replace(settings, database=path)
+    seed(settings)
+
+
 if __name__ == "__main__":
-    seed(load_settings())
+    main()

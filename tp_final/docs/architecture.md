@@ -21,7 +21,7 @@ Los archivos (máximo 10 MiB) se almacenan como BLOB SQLite junto a metadatos; e
 mantiene atomicidad, cascada y backups en un solo archivo. La carga usa body binario
 y `X-Filename` codificado, sin dependencias multipart adicionales. Los nombres no
 se usan como rutas. Las descargas requieren sesión y se fuerzan como attachment.
-El límite por paso es 20 evidencias; los enlaces son HT../pignatelli-iisaia/tp_final/HTTPS sin fetch del servidor.
+El límite por paso es 20 evidencias; los enlaces son HTTP/HTTPS sin fetch del servidor.
 No hay antivirus ni validación interna de los formatos; para gran volumen conviene
 almacenamiento de objetos y análisis de contenido.
 

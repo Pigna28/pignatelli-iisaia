@@ -1,5 +1,39 @@
 # Evidencia de verificación
 
+## Integración de la carpeta v2 — 14/10/2026
+
+Se preparó una copia de esta entrega con el código vigente de hilos y evidencias,
+sin copiar la base de datos de la otra carpeta. Entorno: Windows, Python 3.14.6,
+Chrome 155.0.8059.80.
+
+Resultados de esta preparación:
+
+- **91 pruebas aprobadas**, incluidas las de hilos, archivos, contrato, autenticación,
+  migración y compatibilidad del conjunto anterior. Dos advertencias de deprecación
+  de Authlib/Starlette; no se midió de nuevo la cobertura.
+- **Ruff sin errores** para backend, tests, scripts y run.py.
+- **Chrome:** cinco indicadores, creación y edición de pasos, tres estados,
+  adjuntos y descargas, CSV, persistencia, borrado y error de red; sin errores
+  JavaScript ni desbordamiento horizontal móvil. Capturas de escritorio y móvil
+  revisadas en `artifacts/threads-v2/`.
+- Sobre una copia de la base v1 de esta entrega se conservan las 8 muestras,
+  48 mediciones y 56 eventos originales. Tras migrar y agregar A0/A1/A2:
+  **11 muestras, 60 hilos, 84 pasos, 9 adjuntos y 116 eventos**. Resumen:
+  42 aprobados, 14 fallidos y 4 en progreso. Repetir la carga no cambia los totales.
+  Integridad y claves foráneas comprobadas.
+- Presentación regenerada en PDF, PPTX y HTML: 10 diapositivas con notas alineadas,
+  capturas de hilos y texto editable en PowerPoint; XML, relaciones y navegación
+  verificados por el generador y vista general revisada visualmente.
+
+Las pruebas se ejecutaron con bases temporales y con una copia para verificar
+la migración. La base de destino se respalda antes de aplicar la integración.
+No se probó Auth0 con cuentas reales, despliegue ni apertura en PowerPoint.
+
+La primera corrida de pytest usó una carpeta temporal cuyo padre aún no existía;
+se corrigió la ubicación y la suite completa aprobó. Los apartados siguientes
+conservan evidencias anteriores de la aplicación de origen.
+
+
 ## Correcciones vigentes — 13/10/2026
 
 Entorno: Windows, Python **3.13.14**, Chrome **155.0.8059.41**. Proyecto:

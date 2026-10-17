@@ -1,8 +1,8 @@
 # Contexto de trabajo de IC Bring-up Lab
 
 Leer primero README.md y docs/spec.md. Para contratos, openapi.yaml; para decisiones,
-docs/architecture.md. El material de clase y tp-referencia son fuentes de consulta.
-No editar tp-referencia ni opeanapi.yaml: es el contrato histórico del alumno.
+docs/architecture.md. El material de clase es fuente de consulta.
+No editar opeanapi.yaml: es el contrato histórico del alumno.
 
 ## Invariantes
 

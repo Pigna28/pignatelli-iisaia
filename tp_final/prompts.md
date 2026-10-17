@@ -1,147 +1,63 @@
-# Registro de contexto y prompts — TP3
+# Registro de Prompts y Decisiones — TP3
 
-## Antecedentes
+Este documento registra los prompts que utilicé para que la IA programe el código del servidor web y la base de datos, basándose en el contrato OpenAPI que diseñé previamente para el laboratorio de *bring-up*.
 
-Los prompts originales del contrato TP2 se conservan sin cambios en
-[docs/history/prompts-tp2.md](docs/history/prompts-tp2.md).
-El contrato original es [opeanapi.yaml](opeanapi.yaml).
+## 1. Creación del Servidor y Base de Datos Base
 
-## Pedido real de esta implementación
+**Qué buscabamos obtener:**
+Queríamos levantar el servidor rápido en la terminal de Visual Studio Code para probarlo con el frontend en Vanilla JS. Por eso le pedimos a la IA que use **FastAPI** (porque lee los esquemas solos y valida los tipos de datos) y **SQLite** (porque guarda todo en un archivo local sin tener que instalar motores de bases de datos complejos).
 
-> Basate en el tp de referencia en tp3\tp-referencia
-> Quiero que basado en el contexto de la implementacion en los documentos openapi.yal, readme y promps en la carpeta tp3 realices:
->
-> La totalidad del tp, documentacion y demás complementos necesarios, determina que complementos tareas y añadidos pueden darse para que la implemetacion tome profesionalismo y sea capaz de implementar todos los conceptos que se buscan.
->
-> A demás tienes en la carpeta IISAIA-main los documentos de la materia por si necesitas consultar material
+**El prompt utilizado:**
+> "Tengo este archivo `openapi.yaml` que define una API para registrar muestras de chips y sus mediciones. Necesito que programes el backend usando FastAPI y SQLite. 
+> Reglas estrictas:
+> - Respetá exactamente las rutas, los métodos (GET, POST, DELETE) y los esquemas JSON que están en el YAML.
+> - Creá las tablas en SQLite relacionando los ensayos con los chips mediante una clave foránea (foreign key) para que un ensayo no pueda existir sin su chip.
+> - Si un dato viene mal en el body, el servidor debe devolver error 400. Si piden un chip que no existe, debe devolver 404."
 
-## Contexto utilizado
+---
 
-1. README, prompts y contrato originales de `tp3` para preservar el dominio.
-2. README, código Auth0 y dependencias de `tp-referencia` para estudiar el ejemplo.
-3. Material de semanas 00, 04 y 05 para identificar producto completo, contexto,
-   evidencia de proceso, planificación y verificación.
-4. Documentación oficial de FastAPI y Authlib para contrastar integración y pruebas.
+## 2. Iteración: Agregando estados y carga de evidencias
 
-## Decisiones propuestas por el agente
+**Qué buscabamos obtener:**
+Validada la primera instrucción, nos dimos cuenta de que un ensayo de laboratorio no se hace en un solo paso. Necesitabamos que los ensayos fueran "hilos" con pasos cronológicos, que tuvieran estados (Aprobado, Fallido, En progreso) y que los ingenieros pudieran adjuntar imágenes o PDFs de las mediciones del instrumental. 
 
-Se adoptaron FastAPI, SQLite estándar y JavaScript nativo. Se mantuvieron las rutas
-originales y se sumaron resumen, sesión y auditoría. Se eligió Auth0 en servidor,
-autorización por subject, CSRF y modo local exclusivamente loopback.
-Se agregaron seed explícito, CSV, backup, CI y pruebas. Estas decisiones se tomaron
-bajo la autorización general del pedido; no fueron respuestas del usuario a un
-cuestionario ni decisiones históricas suyas.
+**El prompt utilizado:**
+> "Necesitamos iterar el diseño de la base de datos y los endpoints:
+> 1. Modificá los ensayos para que ahora tengan 3 estados posibles: 'Aprobado', 'Fallido' o 'En progreso'. 
+> 2. Actualizá el GET de resumen para que cuente cuántos ensayos hay en cada uno de estos 3 estados.
+> 3. Agregá un endpoint nuevo que permita subir archivos (imágenes o PDFs de hasta 10 MB) para adjuntarlos como evidencia a un ensayo específico. Estos archivos deben guardarse localmente.
+> Escribí el código para actualizar la base de datos de SQLite con estos cambios sin borrar los chips que ya teníamos cargados."
 
-## Iteración observada
+**Corrección posterior:**
+Al probar el código que devolvió la IA, los archivos temporales se guardaban con problemas de permisos y la ruta de respuesta (`schema-out`) del resumen no mostraba el estado 'En progreso'. Para eso, solicitamos que se cree una carpeta dedicada llamada `artifacts/` para guardar los archivos, y que corrija el esquema JSON de salida para cumplir el contrato.
 
-- Especificación y plan en disco antes de los módulos de aplicación.
-- Primera suite: 37 aprobadas y 1 falla en la expectativa de reemisión de cookie.
-- Corregida la prueba: 38 aprobadas.
-- Primer flujo en Chrome: falla SQLite por cambio de hilo del worker.
-- Corrección del ciclo de conexiones y regresión concurrente: flujo aprobado.
-- Suite ampliada: 52 aprobadas y 99% de cobertura del backend.
+---
 
-Las pruebas se escribieron después de los primeros módulos: este trabajo no se
-presenta como una ejecución TDD estricta. No se ejecutaron subagentes ni el plugin
-Superpowers. Tampoco se generó un historial Git artificial.
+## 3. Preparación de la base de datos para la demo
 
-## Prompts sugeridos para continuar (no ejecutados)
+**Qué buscábamos obtener:**
+Necesitábamos datos de ejemplo para mostrar las funcionalidades del TP durante la exposición. La idea era poder recorrer la aplicación con casos variados, sin tener que cargar cada chip y ensayo a mano.
 
-### Agregar una métrica sin alterar el contrato
+**El prompt utilizado:**
+> "Necesito que generes un set de datos base para este TP, representativo de las funcionalidades para una exposición.
+> - Cargá muestras de chips con ensayos de Tx, Rx y PLL, incluyendo resultados aprobados y fallidos.
+> - Agregá reensayos, muestras con pruebas incompletas y otras sin ensayos.
+> - Los datos tienen que servir para mostrar la búsqueda, los filtros, la exportación a CSV y la bitácora.
+> - Usá datos ficticios y dejá un script para volver a cargar la demo.
+> - Conservá los datos que ya existan y evitá que la demo se duplique si ejecuto el script más de una vez."
 
-“Leé AGENTS.md y docs/spec.md. Proponé un catálogo opcional de métricas y unidades,
-conservando TestInput y los registros existentes. Separá sugerencias de validaciones
-obligatorias y mostrámelas antes de cambiar el comportamiento.”
+**Resultado obtenido:**
+La primera demo contenía 8 muestras y 48 mediciones (38 aprobadas y 10 fallidas),
+con origen en `fixtures/demo_lab.json`. Ese conjunto se conserva como antecedente;
+su cargador es `scripts/seed_measurements_legacy.py`.
 
-### Diagnosticar una regresión
+Para representar el flujo de hilos se incorporó la campaña A0/A1/A2 mediante
+`scripts/seed_demo.py`: 3 muestras, 12 hilos con 36 pasos y 9 archivos CSV, con
+4 hilos aprobados, 4 fallidos y 4 en progreso. El script conserva datos anteriores
+y no duplica la campaña. Las mediciones de la primera demo se migran sin borrarlas.
 
-“Reproducí el defecto con una prueba que falle, identificá la causa y corregí el
-módulo mínimo. No cambies el contrato para hacer pasar la prueba. Ejecutá la
-regresión y las verificaciones afectadas; informá evidencia real.”
+**Corrección de la entrega:** la carpeta v2 había quedado basada en una copia
+anterior sin hilos; se integró el código vigente y se ajustaron demo y presentación.
 
-### Preparar la defensa
-
-“Usá docs/defense.md para preguntarme por una decisión a la vez. Pedime explicar
-el camino de una request desde el formulario hasta SQLite y detectar qué pasa
-cuando falla la auditoría. No respondas por mí antes de que lo intente.”
-
-## Correcciones solicitadas — 13/10/2026
-
-Pedido real del usuario, sobre `tp_final/README.md` y `tp_final/prompts.md`:
-
-```text
-Correcciones a realizar:
-
-1. Debería añadirse la seccion de En progreso (amarillo)
-2. Las secciones de muestras registradas, ensayos realizados, aprobados y fallidos deberían poder enviar a una subseccion donde se especifiquen todos los realizados
-3. Los ensayos realizados para cada muestra deberían ser un hilo de pruebas, no una en particular. Dentro de este hilo se debería poder cargar documentos en cada paso, como presentaciones, links o imagenes
-4. Actualiza el promps y el README cuando termines las correcciones
-```
-
-### Implementación de la corrección
-
-Se localizó el proyecto activo en `pignatelli-iisaia/tp_final`, dado que el directorio
-de trabajo anterior `IISAIA` ya no contenía el TP. Se preservó la aplicación existente
-y se registró el diseño en `docs/changes-2026-10-13.md` antes de extender el modelo.
-
-- Se agregó el indicador amarillo En progreso y navegación a listados globales
-  desde los cinco indicadores, con acceso al detalle de cada muestra/hilo.
-- Se reemplazó la UI de ensayos individuales por hilos de pruebas con pasos
-  cronológicos, notas, estado editable, medición opcional y evidencias por paso.
-- Se implementaron carga/descarga de archivos y enlaces HT../pignatelli-iisaia/tp_final/HTTPS, con controles
-  de sesión, permisos, CSRF, jerarquía y límites de tamaño/cantidad.
-- Se agregó una migración transaccional v1→v2: cada medición previa se convierte en
-  un hilo de un paso, conservando los datos. No se agrupó por supuesta campaña.
-- Se actualizaron contrato OpenAPI 2.0.0, README y documentación de operación.
-
-### Decisiones de implementación inferidas
-
-El usuario pidió el estado y los hilos, pero no definió cómo agregar los resultados.
-Se eligió: algún paso fallido → hilo fallido; sin fallos, vacío o pasos pendientes
-→ en progreso; todos aprobados → aprobado. Los indicadores cuentan hilos, no pasos.
-
-Se eligieron archivos dentro de SQLite (backup y cascada atómicos), límite de
-10 MiB por archivo y 20 evidencias por paso. Se permiten documentos, presentaciones
-e imágenes comunes; las descargas son forzadas y autenticadas. No se agregó un
-servicio externo, nuevas dependencias ni un antivirus. Estas son decisiones del
-agente dentro del alcance pedido, no requisitos textuales del usuario.
-
-### Evidencia y ajustes
-
-La primera ejecución de pytest encontró permisos heredados en el directorio
-temporal y la caché de la instalación movida. Se usaron directorios nuevos dentro
-de `artifacts/` sin alterar permisos globales. Después, el test del contrato detectó
-que faltaba `in_progress` en el schema de resumen: se actualizó junto con la API.
-
-Resultado final de backend: **79 pruebas aprobadas**, **98,62% de cobertura**;
-lint aprobado. En Chrome se verificaron los cinco listados, creación y edición
-de pasos, cambio de estado, cargas de PDF/imagen/presentación, enlaces, descarga,
-persistencia tras recarga, CSV, confirmación de borrados y errores de red.
-Las capturas desktop/móvil se revisaron visualmente. Ver `docs/verification.md`.
-
-Las pruebas usaron bases temporales y no migraron ni borraron datos de trabajo.
-El servidor debe reiniciarse para aplicar los cambios y migrar su base al esquema v2.
-
-## Pedido del 14/10/2026: pool inicial de demostración
-
-> Añade un pull inicial de chips y pruebas iniciales para demostrar funcionalidad
-> Chips A0 A1 A2
-> Hilos mixtos de ancho de banda ganancia ruido y consumo con distintos pasos en distintas etapas.
-
-Se interpretó «pull» como un pool de datos iniciales. Se implementó una campaña
-sintética de 3 chips, 12 hilos, 36 pasos y 9 archivos CSV de evidencia. Decisiones
-de implementación: cuatro hilos por chip, cuatro hilos por estado global y etapas
-de preparación, medición y revisión. Los pendientes se distinguen mediante notas;
-el modelo existente conserva sus tres estados. Los valores no son especificaciones
-eléctricas ni mediciones reales.
-
-La carga usa el modelo de hilos directamente y un marcador en auditoría para no
-duplicar ni sobrescribir la campaña. Se ejecuta solo en desarrollo local y permite
-bases pobladas. Cada alta y su auditoría comparten la transacción. No se ejecuta
-automáticamente al arrancar.
-
-Verificación: 82 tests aprobados, cobertura backend 98,62%, Ruff y formato correctos.
-Chrome verificó navegación, pasos, evidencias, exportación y persistencia con esta
-demo en una base temporal. Se cargó además en `data/lab.db`, con backup previo en
-`data/backups/antes-demo-20261014-024615-672674.db`, 60 altas auditadas e integridad
-SQLite correcta. README y especificación actualizados.
+Los archivos adjuntos de la implementación vigente quedan dentro de `data/lab.db`;
+`artifacts/` reúne capturas y salidas de verificación, no los adjuntos de los pasos.

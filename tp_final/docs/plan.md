@@ -14,3 +14,30 @@
 
 El plan se registra antes del código de la aplicación. No se inventarán commits,
 reviews de subagentes ni ejecuciones de plugins que no hayan ocurrido.
+
+## Ampliación: conjunto para exposición
+
+1. Preparar un JSON reproducible de ocho muestras y 48 ensayos sintéticos.
+2. Ampliar la carga explícita: validación previa, auditoría y transacción única;
+   conservar el rechazo sobre bases ocupadas salvo `--append`, sin duplicar cargas.
+3. Verificar escenarios por API, integridad, rollback, repetición y backup.
+4. Respaldar la base local, agregar el conjunto y documentar resultados y guion.
+
+## Entrega en la carpeta v2
+
+Conservar el código de la copia indicada, trasladar el JSON y el cargador de demo,
+ampliar la presentación con carga reproducible y backup, verificarla y concentrar
+los entregables dentro de la raíz v2.
+
+## Corrección de la entrega v2 — 14/10/2026
+
+La entrega había quedado basada en la aplicación anterior. Se integra el código
+ya existente de hilos, pasos, tres estados y evidencias desde la copia de trabajo
+más reciente; se preservan la presentación y los prompts editados por el usuario.
+
+1. Incorporar backend, frontend, migración v1→v2, contrato y pruebas existentes.
+2. Usar la campaña A0/A1/A2 como demo vigente; conservar el JSON y cargador históricos.
+3. Probar migración de una copia de la base existente, carga adicional y repetición.
+4. Alinear documentación, capturas, presentación y notas con el flujo de hilos.
+5. Respaldar archivos y base de destino antes de integrar los cambios; verificar
+   que todas las mediciones previas siguen presentes, sin sobrescribirlas.

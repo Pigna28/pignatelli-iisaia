@@ -1,14 +1,13 @@
-# TP final — IC Bring-up Lab
+# TP final — IC Bring-up Lab · entrega v2
 
 Aplicación web para registrar muestras físicas de circuitos integrados y sus
 **hilos de ensayo** en las macros **Tx, Rx y PLL**. Cada hilo contiene una secuencia
 de pasos con notas, estado, mediciones opcionales y evidencias: documentos,
 presentaciones, imágenes o enlaces. Incluye SQLite, Auth0 y auditoría de cambios.
 
-**Verificación actual (14/10/2026):** 82 pruebas aprobadas, 98,62% de
-cobertura del backend; flujo de hilos, indicadores y archivos probado en Chrome,
-con revisión visual de escritorio y móvil.
-Ver [evidencia y límites](docs/verification.md).
+Esta es la aplicación vigente de la [entrega v2](../README.md): hilos, pasos,
+estados y evidencias. La integración se verifica en [verification.md](docs/verification.md).
+Presentación: [docs/presentacion/IC-Bring-up-Lab-v2.html](docs/presentacion/IC-Bring-up-Lab-v2.html).
 
 ## Correcciones incorporadas
 
@@ -24,12 +23,12 @@ Ver [evidencia y límites](docs/verification.md).
 Si el servidor estaba abierto, **reiniciarlo** para cargar el código nuevo y aplicar
 la migración; luego recargar el navegador. Para una base con datos reales, hacer
 primero un backup con `python -m scripts.backup data/backups/antes-v2.db`.
-Las pruebas usan bases temporales. La campaña sintética A0/A1/A2 se cargó también
-en la base local de trabajo el 14/10/2026, con backup previo y sin borrar registros.
+Las pruebas usan bases temporales. Al integrar esta entrega se conserva la demo
+anterior y se agrega A0/A1/A2 con backup previo, sin borrar registros.
 
 ## Ejecutar en Windows
 
-Requiere Python 3.11 o superior. Correcciones probadas con Python 3.13.14. Desde la raíz del repositorio:
+Requiere Python 3.11 o superior. Desde la raíz del repositorio:
 
 ```powershell
 cd tp_final
@@ -42,8 +41,9 @@ Abrir **http://127.0.0.1:8000**. No hace falta activar el entorno virtual ni cam
 la política de ejecución de PowerShell. Si `python` abre Microsoft Store, usar
 `py -3` o la ruta del intérprete instalado para crear el entorno.
 
-En esta carpeta de trabajo ya se creó `.venv` y se instalaron las dependencias;
-alcanza con el último comando para arrancar. El entorno virtual no se versiona.
+Si esta carpeta ya tiene su `.venv` y las dependencias, alcanza con el último
+comando. Ejecutarlo desde `pignatelli-iisaia-main_v2/tp_final` para abrir esta
+versión. El entorno virtual no se versiona.
 
 En Linux/macOS, reemplazar `.\.venv\Scripts\python.exe` por `.venv/bin/python`.
 El archivo lock conserva todas las versiones verificadas, incluyendo herramientas
@@ -69,6 +69,16 @@ El marcador de carga queda en auditoría y cada alta se audita en una transacci�
 No carga datos automáticamente al iniciar. Usa `DATABASE_PATH` o `data/lab.db`
 por defecto. Recargar la página y abrir los indicadores para explorar los hilos.
 Los valores y resultados son ejemplos, no criterios eléctricos reales.
+
+La demo anterior de 8 muestras / 48 mediciones se conserva si estaba cargada.
+Cada medición se migra a un hilo de un paso; A0/A1/A2 agrega hilos con tres pasos
+y estados pendientes. En una base que tenía esa demo, el total queda en 11 muestras,
+60 hilos (42 aprobados, 14 fallidos y 4 en progreso). Los totales incluyen cualquier
+otro dato propio que se haya cargado.
+
+Para preparar una base separada, usar `-m scripts.seed_demo --database data/demo-v2.db`.
+El JSON `fixtures/demo_lab.json` y `scripts/seed_measurements_legacy.py` quedan
+como antecedentes de la demo anterior. La demo vigente es `scripts/seed_demo.py`.
 
 ### Autenticación
 
@@ -205,7 +215,6 @@ tp_final/
 └── run.py               arranque local
 ```
 
-La referencia `tp-referencia/` se conserva sin modificar y no forma parte del servidor.
 La ejecución remota de CI no se verificó en esta corrección.
 
 ## Verificar
@@ -238,7 +247,6 @@ La especificación y el plan se escribieron antes del código de la aplicación.
 La implementación se dividió en módulos y se verificó por etapas. Los archivos
 `AGENTS.md` conservan contexto para siguientes sesiones. [prompts.md](prompts.md)
 distingue el pedido real de las decisiones inferidas y de prompts sugeridos.
-Los informes previos están conservados en [docs/history](docs/history/README-tp2.md).
 
 ### Qué falló y qué se corrigió
 
@@ -265,7 +273,6 @@ La defensa requiere que el alumno revise y pueda explicar las decisiones.
 - [Trazabilidad con la materia y guion de defensa](docs/defense.md).
 - [Verificación y límites](docs/verification.md).
 - [Mejoras priorizadas](docs/roadmap.md).
-- [Diseño y aceptación de las correcciones de hilos](docs/changes-2026-10-13.md).
 
 ## Alcance pendiente externo
 

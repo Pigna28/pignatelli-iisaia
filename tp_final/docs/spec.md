@@ -42,7 +42,7 @@ El login real requiere un tenant y credenciales del titular.
 ## Extensión vigente: hilos y evidencias
 
 La versión 2.0.0 implementa el pedido del 13/10/2026 en
-[changes-2026-10-13.md](changes-2026-10-13.md): ensayos como hilos, pasos con estado,
+13/10/2026: ensayos como hilos, pasos con estado,
 En progreso amarillo, indicadores globales navegables y archivos/enlaces por paso.
 Los contadores ahora cuentan hilos y las mediciones anteriores se migran a hilos
 de un paso. Esta extensión reemplaza el flujo de medición individual de la UI.
@@ -52,3 +52,12 @@ de un paso. Esta extensión reemplaza el flujo de medición individual de la UI.
 La campaña del 14/10/2026 se especifica en [demo-data.md](demo-data.md): chips
 A0/A1/A2 con cuatro tipos de ensayo, pasos en distintas etapas y evidencias CSV.
 La carga explícita preserva datos existentes, se audita y no se duplica al repetirla.
+
+## Integración de la entrega v2 — 14/10/2026
+
+Esta carpeta debe ejecutar las funcionalidades vigentes de la copia de trabajo:
+hilos con pasos, En progreso, indicadores navegables y evidencias por paso.
+La presentación debe explicar ese flujo. La campaña A0/A1/A2 es la demo principal;
+las ocho muestras y 48 mediciones previas se conservan y migran individualmente.
+No se mezclan ni reagrupan mediciones históricas por inferencia. Antes de cambiar
+la base existente se realiza un backup consistente con SQLite.
